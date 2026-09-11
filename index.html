@@ -215,6 +215,12 @@
   .helptext{ font-size:.74rem; color: var(--text-faint); line-height:1.4; }
 
   /* envelope screen */
+  .stay-online-banner{
+    display:flex; align-items:center; gap:9px; background: color-mix(in srgb, var(--teal) 14%, var(--surface));
+    border:1px solid var(--teal); border-radius:12px; padding:10px 12px; margin-bottom:10px;
+    font-size:.76rem; font-weight:600; color: var(--teal-strong); line-height:1.35;
+  }
+  .stay-online-icon{ font-size:1rem; flex:none; }
   .envelope-wrap{ display:flex; flex-direction:column; align-items:center; padding-top: 8px; gap: 14px; }
   .code-badge{ font-size:.72rem; color: var(--text-faint); background:var(--surface); border:1px dashed var(--border); padding:6px 12px; border-radius:999px; }
   .envelope{
@@ -413,6 +419,10 @@
 
           <!-- OPEN / LIVE SCREEN -->
           <div class="screen" id="screenOpen" style="display:none;">
+            <div class="stay-online-banner">
+              <span class="stay-online-icon">📲</span>
+              <span>Reste sur cette page : chaque envoi part de ton wallet, en direct.</span>
+            </div>
             <div class="envelope-wrap">
               <span class="code-badge" id="dropCode">Code : ——</span>
               <button class="envelope" id="envelopeBtn">
