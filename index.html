@@ -1,0 +1,829 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<title>NIM Drop</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #fbf1e4;
+    --surface: #ffffff;
+    --surface-2: #fdeada;
+    --border: #e8d3ba;
+    --text: #2b0f14;
+    --text-dim: #7a5548;
+    --text-faint: #a9836f;
+    --gold: #c8890a;
+    --gold-strong: #a86f06;
+    --garnet: #7a1f2b;
+    --garnet-strong: #5c1420;
+    --teal: #1c8f83;
+    --teal-strong: #146f65;
+    --good: #2f9e57;
+    --shadow: 0 20px 48px -24px rgba(43,15,20,0.35);
+    --shadow-sm: 0 8px 20px -12px rgba(43,15,20,0.3);
+    --radius: 20px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg: #241012;
+      --surface: #33171b;
+      --surface-2: #3c1c21;
+      --border: #522229;
+      --text: #f9ece2;
+      --text-dim: #d3ab9a;
+      --text-faint: #a37e6f;
+      --gold: #f0b429;
+      --gold-strong: #ffcc5c;
+      --garnet: #e26a7a;
+      --garnet-strong: #f0899a;
+      --teal: #4fd6c7;
+      --teal-strong: #7ae6da;
+      --good: #4ade80;
+      --shadow: 0 20px 48px -20px rgba(0,0,0,0.55);
+      --shadow-sm: 0 8px 20px -12px rgba(0,0,0,0.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg: #241012;
+    --surface: #33171b;
+    --surface-2: #3c1c21;
+    --border: #522229;
+    --text: #f9ece2;
+    --text-dim: #d3ab9a;
+    --text-faint: #a37e6f;
+    --gold: #f0b429;
+    --gold-strong: #ffcc5c;
+    --garnet: #e26a7a;
+    --garnet-strong: #f0899a;
+    --teal: #4fd6c7;
+    --teal-strong: #7ae6da;
+    --good: #4ade80;
+    --shadow: 0 20px 48px -20px rgba(0,0,0,0.55);
+    --shadow-sm: 0 8px 20px -12px rgba(0,0,0,0.5);
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Sora', system-ui, sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1,h2,h3{
+    font-family: 'Fraunces', Georgia, serif;
+    text-wrap: balance;
+    margin: 0;
+    font-weight: 600;
+  }
+  p{ margin:0; }
+  a{ color: inherit; }
+  .num{ font-variant-numeric: tabular-nums; }
+  img{ max-width:100%; }
+
+  .wrap{ max-width: 1180px; margin: 0 auto; padding: 0 28px; }
+
+  /* ---------- header ---------- */
+  header.top{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 22px 28px;
+    max-width: 1180px; margin: 0 auto;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; font-family:'Fraunces',serif; font-weight:700; font-size:1.15rem; letter-spacing:.01em; }
+  .brand .mark{
+    width:34px; height:34px; border-radius:10px;
+    background: linear-gradient(155deg, var(--gold) 0%, var(--garnet) 100%);
+    display:flex; align-items:center; justify-content:center;
+    font-size:18px; box-shadow: var(--shadow-sm);
+  }
+  .chip{
+    font-size: .72rem; letter-spacing:.08em; text-transform: uppercase;
+    color: var(--teal-strong); background: var(--surface-2);
+    border: 1px solid var(--border); padding: 7px 12px; border-radius: 999px;
+    font-weight:600;
+  }
+
+  /* ---------- hero ---------- */
+  .hero{ padding: 40px 0 30px; }
+  .hero-grid{ display:grid; grid-template-columns: 1.05fr .95fr; gap: 56px; align-items:center; }
+  @media (max-width: 880px){ .hero-grid{ grid-template-columns: 1fr; } }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:.78rem; font-weight:700; letter-spacing:.09em; text-transform:uppercase;
+    color: var(--garnet-strong);
+    margin-bottom: 18px;
+  }
+  .eyebrow::before{ content:"🧧"; font-size:1rem; }
+  .hero h1{
+    font-size: clamp(2.4rem, 4.6vw, 3.6rem);
+    line-height: 1.04;
+    letter-spacing: -0.01em;
+  }
+  .hero h1 em{ font-style: normal; color: var(--gold-strong); }
+  .hero p.lead{
+    margin-top:20px; font-size:1.1rem; color: var(--text-dim); max-width: 46ch;
+  }
+  .hero-cta{ display:flex; gap:12px; margin-top: 30px; flex-wrap:wrap; }
+  .btn{
+    appearance:none; border:none; cursor:pointer; font-family:'Sora',sans-serif;
+    font-weight:700; font-size:.95rem; padding: 14px 24px; border-radius: 14px;
+    display:inline-flex; align-items:center; gap:8px;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:active{ transform: translateY(1px); }
+  .btn:focus-visible{ outline: 3px solid var(--teal); outline-offset:2px; }
+  .btn-primary{ background: linear-gradient(135deg, var(--gold) 0%, var(--gold-strong) 100%); color:#2b1500; box-shadow: var(--shadow-sm); }
+  .btn-primary:hover{ box-shadow: var(--shadow); }
+  .btn-ghost{ background: transparent; color: var(--text); border: 1.5px solid var(--border); }
+  .btn-ghost:hover{ border-color: var(--teal); color: var(--teal-strong); }
+
+  .stat-row{ display:flex; gap: 28px; margin-top: 38px; flex-wrap:wrap; }
+  .stat b{ display:block; font-family:'Fraunces',serif; font-size:1.6rem; color: var(--gold-strong); }
+  .stat span{ font-size:.78rem; color: var(--text-faint); text-transform:uppercase; letter-spacing:.06em; }
+
+  /* ---------- phone / demo ---------- */
+  .phone-stage{ display:flex; justify-content:center; position:relative; }
+  .phone{
+    width: 100%; max-width: 360px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 34px;
+    box-shadow: var(--shadow);
+    padding: 14px;
+    position: relative;
+  }
+  .phone-screen{
+    background: var(--surface-2);
+    border-radius: 24px;
+    overflow: hidden;
+    min-height: 560px;
+    display:flex; flex-direction:column;
+    position:relative;
+  }
+  .phone-notch{
+    position:absolute; top:14px; left:50%; transform:translateX(-50%);
+    width:70px; height:6px; border-radius:999px; background: var(--border);
+    z-index:5;
+  }
+  .app-bar{
+    padding: 26px 18px 14px; display:flex; align-items:center; justify-content:space-between;
+  }
+  .app-bar .app-name{ font-family:'Fraunces',serif; font-weight:700; font-size:1.05rem; }
+  .status-pill{
+    font-size:.65rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase;
+    padding: 5px 9px; border-radius:999px; background: var(--surface); border:1px solid var(--border);
+    color: var(--text-faint); display:flex; align-items:center; gap:5px;
+  }
+  .status-pill .dot{ width:6px; height:6px; border-radius:50%; background: var(--text-faint); }
+  .status-pill.live .dot{ background: var(--good); box-shadow: 0 0 0 3px color-mix(in srgb, var(--good) 25%, transparent); }
+  .status-pill.live{ color: var(--good); }
+
+  .tabs{ display:flex; gap:6px; padding: 0 18px 14px; }
+  .tab-btn{
+    flex:1; padding: 10px; border-radius: 12px; border:1px solid var(--border);
+    background: var(--surface); color: var(--text-dim); font-weight:700; font-size:.82rem;
+    cursor:pointer; font-family:'Sora',sans-serif;
+  }
+  .tab-btn.active{ background: linear-gradient(135deg, var(--gold) 0%, var(--gold-strong) 100%); color:#2b1500; border-color: transparent; }
+
+  .screen{ flex:1; padding: 6px 18px 22px; display:flex; flex-direction:column; gap:14px; overflow-y:auto; }
+  .field label{ display:block; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color: var(--text-faint); margin-bottom:6px; }
+  .field input, .field select{
+    width:100%; padding: 12px 13px; border-radius: 12px; border:1px solid var(--border);
+    background: var(--surface); color: var(--text); font-family:'Sora',sans-serif; font-size:.95rem;
+  }
+  .field input:focus, .field select:focus{ outline: 2px solid var(--teal); outline-offset:1px; }
+  .row2{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+  .mode-toggle{ display:flex; gap:8px; }
+  .mode-toggle button{
+    flex:1; padding:10px; border-radius:12px; border:1px solid var(--border); background:var(--surface);
+    color:var(--text-dim); font-weight:700; font-size:.82rem; cursor:pointer; font-family:'Sora',sans-serif;
+  }
+  .mode-toggle button.active{ border-color: var(--teal); color: var(--teal-strong); background: color-mix(in srgb, var(--teal) 12%, var(--surface)); }
+
+  .create-btn{
+    margin-top:4px; width:100%; padding:14px; border-radius:14px; border:none; cursor:pointer;
+    background: linear-gradient(135deg, var(--garnet) 0%, var(--garnet-strong) 100%); color:#fff;
+    font-weight:700; font-size:.95rem; font-family:'Sora',sans-serif; box-shadow: var(--shadow-sm);
+  }
+  .helptext{ font-size:.74rem; color: var(--text-faint); line-height:1.4; }
+
+  /* envelope screen */
+  .envelope-wrap{ display:flex; flex-direction:column; align-items:center; padding-top: 8px; gap: 14px; }
+  .code-badge{ font-size:.72rem; color: var(--text-faint); background:var(--surface); border:1px dashed var(--border); padding:6px 12px; border-radius:999px; }
+  .envelope{
+    width: 220px; height: 260px; border-radius: 20px;
+    background: linear-gradient(160deg, var(--garnet) 0%, var(--garnet-strong) 70%);
+    position:relative; box-shadow: var(--shadow);
+    display:flex; align-items:center; justify-content:center; flex-direction:column; gap:10px;
+    cursor:pointer; border: none; color:#fff; font-family:'Sora',sans-serif;
+    transition: transform .18s ease;
+  }
+  .envelope:active{ transform: scale(.97); }
+  .envelope::before{
+    content:""; position:absolute; inset:0; border-radius:20px;
+    background: repeating-linear-gradient(135deg, rgba(240,180,41,0.08) 0 2px, transparent 2px 14px);
+  }
+  .envelope .seal{
+    width:58px; height:58px; border-radius:50%;
+    background: linear-gradient(155deg, var(--gold) 0%, var(--gold-strong) 100%);
+    display:flex; align-items:center; justify-content:center; font-size:26px; color:#2b1500;
+    box-shadow: 0 6px 16px -6px rgba(0,0,0,.5);
+    position:relative; z-index:1;
+  }
+  .envelope .tap-label{ font-weight:700; font-size:.9rem; position:relative; z-index:1; }
+  .envelope .amt-label{ font-size:.72rem; opacity:.85; position:relative; z-index:1; }
+
+  .progress-track{ width:100%; height:8px; border-radius:999px; background:var(--surface); border:1px solid var(--border); overflow:hidden; }
+  .progress-fill{ height:100%; background: linear-gradient(90deg, var(--teal), var(--teal-strong)); width:0%; transition: width .4s ease; }
+  .progress-caption{ display:flex; justify-content:space-between; font-size:.72rem; color:var(--text-faint); }
+
+  .feed{ display:flex; flex-direction:column; gap:8px; margin-top:4px; }
+  .feed-item{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background: var(--surface); border:1px solid var(--border); border-radius:12px; padding:9px 12px;
+    font-size:.82rem; animation: pop .25s ease;
+  }
+  @keyframes pop{ from{ opacity:0; transform: translateY(6px); } to{ opacity:1; transform:none; } }
+  .feed-item .who{ font-weight:700; }
+  .feed-item .amt{ color: var(--gold-strong); font-weight:700; }
+  .feed-item.you .amt{ color: var(--teal-strong); }
+  .feed-empty{ font-size:.78rem; color: var(--text-faint); text-align:center; padding: 10px 0; }
+
+  .luckiest{
+    display:flex; align-items:center; gap:10px; background: var(--surface); border:1px solid var(--border);
+    border-radius:14px; padding:12px 14px; font-size:.82rem;
+  }
+  .luckiest .crown{ font-size:1.2rem; }
+
+  .simulate-btn{
+    width:100%; padding:12px; border-radius:12px; border:1.5px solid var(--teal); background:transparent;
+    color:var(--teal-strong); font-weight:700; font-size:.85rem; cursor:pointer; font-family:'Sora',sans-serif;
+  }
+  .simulate-btn:disabled{ opacity:.4; cursor:not-allowed; }
+  .reset-btn{
+    width:100%; padding:10px; border-radius:12px; border:none; background:transparent;
+    color:var(--text-faint); font-weight:600; font-size:.78rem; cursor:pointer; font-family:'Sora',sans-serif; text-decoration:underline;
+  }
+
+  canvas#confetti{ position:fixed; inset:0; pointer-events:none; z-index:999; }
+
+  /* ---------- how it works ---------- */
+  .section{ padding: 84px 0; }
+  .section-head{ max-width: 620px; margin: 0 auto 44px; text-align:center; }
+  .section-head .eyebrow{ justify-content:center; display:flex; }
+  .section-head h2{ font-size: clamp(1.8rem, 3vw, 2.4rem); }
+  .section-head p{ color: var(--text-dim); margin-top:12px; }
+
+  .steps{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  @media (max-width: 820px){ .steps{ grid-template-columns: 1fr; } }
+  .step{
+    background: var(--surface); border:1px solid var(--border); border-radius: var(--radius);
+    padding: 26px 24px; display:flex; flex-direction:column; gap:12px;
+  }
+  .step .n{
+    font-family:'Fraunces',serif; font-size:1.6rem; color: var(--gold-strong); font-weight:700;
+  }
+  .step h3{ font-size:1.05rem; }
+  .step p{ color: var(--text-dim); font-size:.92rem; }
+
+  .faq-list{ display:flex; flex-direction:column; gap:16px; max-width:720px; margin:0 auto; }
+  .faq-item{
+    background: var(--surface); border:1px solid var(--border); border-radius: var(--radius);
+    padding: 22px 26px;
+  }
+  .faq-item h3{ font-size:1.02rem; margin-bottom:8px; font-family:'Sora',sans-serif; font-weight:700; }
+  .faq-item p{ color: var(--text-dim); font-size:.92rem; }
+  .faq-item p b{ color: var(--text); }
+
+  /* why nimiq strip */
+  .why{ background: var(--surface); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+  .why-grid{ display:grid; grid-template-columns: repeat(3,1fr); gap:0; }
+  @media (max-width: 820px){ .why-grid{ grid-template-columns: 1fr; } }
+  .why-item{ padding: 30px 26px; border-left: 1px solid var(--border); }
+  .why-item:first-child{ border-left:none; }
+  @media (max-width: 820px){ .why-item{ border-left:none; border-top:1px solid var(--border); } .why-item:first-child{ border-top:none; } }
+  .why-item .big{ font-family:'Fraunces',serif; font-size:2rem; color: var(--teal-strong); }
+  .why-item h4{ margin: 8px 0 6px; font-size:.95rem; font-weight:700; }
+  .why-item p{ font-size:.85rem; color: var(--text-dim); }
+
+  /* code / tech credibility */
+  .tech{ display:grid; grid-template-columns: .95fr 1.05fr; gap: 40px; align-items:center; }
+  @media (max-width: 880px){ .tech{ grid-template-columns:1fr; } }
+  .tech h2{ font-size: clamp(1.6rem,2.6vw,2.1rem); }
+  .tech p{ color: var(--text-dim); margin-top:14px; }
+  .tech ul{ margin: 18px 0 0; padding:0; list-style:none; display:flex; flex-direction:column; gap:10px; }
+  .tech li{ display:flex; gap:10px; font-size:.9rem; color: var(--text-dim); }
+  .tech li::before{ content:"✓"; color: var(--good); font-weight:700; }
+  .code-panel{
+    background: #1b0c0e; border-radius: var(--radius); border:1px solid var(--border);
+    box-shadow: var(--shadow); overflow:hidden;
+  }
+  .code-tabbar{ display:flex; gap:2px; background: #150809; padding:10px 10px 0; }
+  .code-tabbar button{
+    background:transparent; border:none; color:#c9a08e; padding:9px 14px; font-size:.78rem;
+    border-radius: 8px 8px 0 0; cursor:pointer; font-family:'Sora',sans-serif; font-weight:600;
+  }
+  .code-tabbar button.active{ background:#1b0c0e; color: var(--gold-strong); }
+  pre.code{ margin:0; padding: 20px; font-family: 'SFMono-Regular', Consolas, monospace; font-size:.82rem; line-height:1.6; color:#f3dfc8; overflow-x:auto; }
+  pre.code .k{ color:#4fd6c7; }
+  pre.code .s{ color:#f0b429; }
+  pre.code .c{ color:#8a6357; }
+
+  footer{ padding: 46px 0 60px; border-top:1px solid var(--border); }
+  .footer-grid{ display:flex; justify-content:space-between; align-items:flex-start; gap:24px; flex-wrap:wrap; }
+  footer .brand{ font-size:1rem; }
+  footer p{ color: var(--text-faint); font-size:.82rem; max-width:44ch; margin-top:8px; }
+  footer .meta{ font-size:.8rem; color: var(--text-faint); text-align:right; }
+  footer .meta div{ margin-bottom:4px; }
+
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    *{ animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="confetti"></canvas>
+
+<header class="top">
+  <div class="brand"><span class="mark">🧧</span> NIM Drop</div>
+  <div class="chip">Nimiq Mini Apps Competition · Cycle II</div>
+</header>
+
+<section class="hero wrap">
+  <div class="hero-grid">
+    <div>
+      <div class="eyebrow">Un mini app pour Nimiq Pay</div>
+      <h1>L'enveloppe rouge porte-bonheur, <em>réinventée</em> sans frais ni serveur.</h1>
+      <p class="lead">NIM Drop transforme n'importe quel groupe en jeu : tu glisses un montant en NIM dans une enveloppe numérique, tu fixes le nombre de parts, et tes amis se battent pour l'ouvrir. Chaque envoi est direct, instantané et à coût nul — grâce au protocole Nimiq.</p>
+      <div class="hero-cta">
+        <a href="#demo" class="btn btn-primary">🧧 Essayer la démo</a>
+        <a href="#why" class="btn btn-ghost">Pourquoi Nimiq ?</a>
+      </div>
+      <div class="stat-row">
+        <div class="stat"><b class="num">0%</b><span>Frais de transaction</span></div>
+        <div class="stat"><b class="num">~1s</b><span>Finalité des paiements</span></div>
+        <div class="stat"><b class="num">0</b><span>Clé privée détenue par l'app</span></div>
+      </div>
+    </div>
+    <div class="phone-stage" id="demo">
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="phone-notch"></div>
+          <div class="app-bar">
+            <span class="app-name">🧧 NIM Drop</span>
+            <span class="status-pill" id="statusPill"><span class="dot"></span><span id="statusText">Mode démo</span></span>
+          </div>
+          <div class="tabs">
+            <button class="tab-btn active" id="tabCreateBtn">Créer</button>
+            <button class="tab-btn" id="tabOpenBtn">Ouvrir</button>
+          </div>
+
+          <!-- CREATE SCREEN -->
+          <div class="screen" id="screenCreate">
+            <div class="field">
+              <label for="amt">Montant total (NIM)</label>
+              <input type="number" id="amt" value="50" min="1" step="1" inputmode="decimal" />
+            </div>
+            <div class="row2">
+              <div class="field">
+                <label for="slices">Nombre d'amis</label>
+                <input type="number" id="slices" value="6" min="2" max="20" step="1" />
+              </div>
+              <div class="field">
+                <label>Répartition</label>
+                <div class="mode-toggle">
+                  <button type="button" id="modeLucky" class="active">Surprise</button>
+                  <button type="button" id="modeEqual">Égale</button>
+                </div>
+              </div>
+            </div>
+            <p class="helptext" id="modeHelp">Chaque part est un montant aléatoire — comme une vraie enveloppe porte-bonheur. Le total distribué reste exact au Luna près.</p>
+            <button class="create-btn" id="createBtn">Créer le drop 🧧</button>
+            <p class="helptext">Aucune enveloppe n'est "prépayée" à une cagnotte : ta NIM ne quitte ton wallet qu'au moment où chaque ami ouvre sa part, avec ta confirmation native à chaque envoi.</p>
+          </div>
+
+          <!-- OPEN / LIVE SCREEN -->
+          <div class="screen" id="screenOpen" style="display:none;">
+            <div class="envelope-wrap">
+              <span class="code-badge" id="dropCode">Code : ——</span>
+              <button class="envelope" id="envelopeBtn">
+                <span class="seal">🧧</span>
+                <span class="tap-label" id="envelopeLabel">Toucher pour ouvrir</span>
+                <span class="amt-label" id="envelopeSub">Un ami peut l'ouvrir</span>
+              </button>
+              <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+              <div class="progress-caption">
+                <span id="progressText">0 / 0 parts ouvertes</span>
+                <span id="progressAmt" class="num">0 / 0 NIM</span>
+              </div>
+            </div>
+
+            <button class="simulate-btn" id="simulateBtn">➕ Simuler l'ouverture d'un ami</button>
+
+            <div id="luckiestWrap" style="display:none;">
+              <div class="luckiest">
+                <span class="crown">👑</span>
+                <span>Part la plus chanceuse : <b id="luckiestName">—</b> avec <b class="num" id="luckiestAmt">—</b> NIM</span>
+              </div>
+            </div>
+
+            <div class="feed" id="feed">
+              <p class="feed-empty">Personne n'a encore ouvert le drop.</p>
+            </div>
+
+            <button class="reset-btn" id="resetBtn">↺ Recommencer la démo</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="how">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Comment ça marche</div>
+      <h2>Trois étapes, zéro friction</h2>
+      <p>Pensé pour un groupe Telegram, une soirée entre amis, ou une communauté crypto qui veut fêter quelque chose.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <span class="n">01</span>
+        <h3>Tu composes le drop</h3>
+        <p>Montant total en NIM, nombre de parts, répartition égale ou "surprise" à la manière d'une enveloppe rouge traditionnelle.</p>
+      </div>
+      <div class="step">
+        <span class="n">02</span>
+        <h3>Tu partages le lien</h3>
+        <p>Un lien Nimiq Pay ou un QR code circule dans le groupe. Chaque membre ouvre NIM Drop directement dans son wallet, sans rien installer.</p>
+      </div>
+      <div class="step">
+        <span class="n">03</span>
+        <h3>Chacun tente sa chance</h3>
+        <p>Premier arrivé, premier servi : chaque ouverture déclenche un envoi NIM direct et instantané, confirmé nativement par ton wallet.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="why" id="why">
+  <div class="wrap why-grid">
+    <div class="why-item">
+      <div class="big num">0 NIM</div>
+      <h4>Aucun frais, même sur 20 envois</h4>
+      <p>Sur la plupart des chaînes, distribuer 20 micro-paiements coûte plus cher en gas que le cadeau lui-même. Sur Nimiq, le protocole reste feeless — le jeu redevient amusant.</p>
+    </div>
+    <div class="why-item">
+      <div class="big num">~1 sec</div>
+      <h4>Confirmation quasi instantanée</h4>
+      <p>Albatross finalise les blocs en une seconde. L'enveloppe s'ouvre, la NIM arrive : pas d'attente, pas de rechargement de page.</p>
+    </div>
+    <div class="why-item">
+      <div class="big">Zéro custody</div>
+      <h4>NIM Drop ne détient jamais tes fonds</h4>
+      <p>Aucune cagnotte intermédiaire. Chaque envoi part directement du wallet du créateur vers celui de l'ami, confirmé via le provider Nimiq Pay natif.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="faq">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Qui paie quoi ?</div>
+      <h2>Aucune cagnotte, aucun intermédiaire</h2>
+      <p>Le point qui surprend le plus au premier abord — voici exactement ce qui se passe à chaque étape.</p>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <h3>Il n'y a pas de cagnotte : qui paie, alors ?</h3>
+        <p><b>Le créateur du drop</b>, à chaque ouverture, depuis son propre wallet. Rien n'est mis de côté au moment de la création : quand un ami touche l'enveloppe, ça déclenche un envoi NIM direct — du wallet du créateur vers celui de l'ami — que le créateur confirme lui-même, native, un par un.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Et les frais de transaction ?</h3>
+        <p>Sur Nimiq, ils sont à <b>0 dans l'immense majorité des cas</b> — le réseau est feeless par design, et le SDK choisit automatiquement le frais le plus bas possible, souvent nul. Ni le créateur ni les amis ne paient de frais réseau : seul le montant du cadeau lui-même circule.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Est-ce que je dois garder l'app ouverte en tant que créateur ?</h3>
+        <p><b>Oui.</b> Comme chaque envoi part de ton wallet à toi et demande ta confirmation, ton app doit rester ouverte pendant que tes amis ouvrent leurs parts — ce n'est pas un lien qui continue de fonctionner tout seul si tu fermes l'app. C'est le prix du "zéro custody" : personne d'autre que toi ne peut jamais envoyer tes fonds à ta place.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap tech">
+    <div>
+      <div class="eyebrow">Intégration technique</div>
+      <h2>Construit sur le vrai Mini App SDK</h2>
+      <p>Cette démo tourne en mode simulé pour être testable dans n'importe quel navigateur. À l'intérieur de Nimiq Pay, elle bascule automatiquement sur les vrais appels du SDK — même code, vraie blockchain.</p>
+      <ul>
+        <li>Détection automatique de <code>window.nimiqPay</code> au chargement</li>
+        <li>Adresse du créateur lue via <code>listAccounts()</code></li>
+        <li>Chaque ouverture déclenche <code>sendBasicTransaction()</code></li>
+        <li>Repli gracieux en mode démo hors de Nimiq Pay</li>
+      </ul>
+    </div>
+    <div class="code-panel">
+      <div class="code-tabbar">
+        <button class="active" id="codeTabConnect">Connexion</button>
+        <button id="codeTabSend">Envoi d'une part</button>
+      </div>
+      <pre class="code" id="codeConnect"><span class="c">// Détection + connexion au wallet Nimiq Pay</span>
+<span class="k">import</span> { init } <span class="k">from</span> <span class="s">'@nimiq/mini-app-sdk'</span>
+
+<span class="k">if</span> (window.nimiqPay) {
+  <span class="k">const</span> nimiq = <span class="k">await</span> init()
+  <span class="k">const</span> accounts = <span class="k">await</span> nimiq.listAccounts()
+  creatorAddress = accounts[<span class="s">0</span>]
+}</pre>
+      <pre class="code" id="codeSend" style="display:none;"><span class="c">// Une part de l'enveloppe part directement</span>
+<span class="c">// du wallet du créateur vers l'ami</span>
+<span class="k">const</span> txHash = <span class="k">await</span> nimiq.sendBasicTransactionWithData({
+  recipient: friend.address,
+  value: sliceInLuna,      <span class="c">// 1 NIM = 100 000 Luna</span>
+  data: <span class="s">'🧧 NIM Drop'</span>,
+})</pre>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap footer-grid">
+    <div>
+      <div class="brand">🧧 NIM Drop</div>
+      <p>Projet conçu pour la Nimiq Mini Apps Competition, Cycle II (24 août – 18 septembre 2026). Prototype ouvert, sans backend, pensé pour être hébergé et chargé dans Nimiq Pay.</p>
+    </div>
+    <div class="meta">
+      <div>Réseau : Nimiq (NIM)</div>
+      <div>SDK : @nimiq/mini-app-sdk</div>
+      <div>Statut : démo interactive</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- theme handled purely by CSS tokens ----------
+
+  // ---------- state ----------
+  var state = {
+    total: 0, count: 0, mode: 'lucky',
+    slices: [], claimed: [], code: '',
+    creatorAddress: null, connected: false
+  };
+
+  var NAMES = ["Nimiqnaut", "AlbatrossFan", "LunaLover", "GarnetGlow", "ZeroFeeZoe", "BlockBird",
+    "StakerSam", "HodlHanna", "ValidatorVic", "GoldenGarnet", "SwiftShard", "ConsensusCat",
+    "PoSPixie", "FeelessFred", "OneSecOllie", "DriftDove"];
+
+  function fmt(n){
+    return (Math.round(n * 100) / 100).toLocaleString('fr-FR', {maximumFractionDigits: 2});
+  }
+
+  function randomCode(){
+    var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    var out = '';
+    for (var i=0;i<6;i++) out += chars[Math.floor(Math.random()*chars.length)];
+    return out;
+  }
+
+  function fakeAddress(){
+    function grp(){ return Math.floor(1000+Math.random()*9000); }
+    return 'NQ' + Math.floor(10+Math.random()*89) + ' ' + grp() + ' ' + grp();
+  }
+
+  function luckySplit(total, count){
+    var remaining = total, remainingCount = count, out = [];
+    for (var i=0;i<count-1;i++){
+      var fairShare = remaining / remainingCount;
+      var max = Math.max(2, Math.floor(fairShare * 2));
+      var reserveForRest = remainingCount - 1;
+      var amt = Math.floor(Math.random()*max) + 1;
+      amt = Math.min(amt, remaining - reserveForRest);
+      amt = Math.max(amt, 1);
+      out.push(amt);
+      remaining -= amt;
+      remainingCount--;
+    }
+    out.push(Math.max(remaining, 0));
+    // shuffle so order of reveal doesn't correlate with size
+    for (var j=out.length-1;j>0;j--){
+      var k = Math.floor(Math.random()*(j+1));
+      var tmp = out[j]; out[j]=out[k]; out[k]=tmp;
+    }
+    return out;
+  }
+
+  function equalSplit(total, count){
+    var base = Math.floor(total / count);
+    var rest = total - base*count;
+    var out = [];
+    for (var i=0;i<count;i++) out.push(base + (i < rest ? 1 : 0));
+    return out;
+  }
+
+  // ---------- DOM refs ----------
+  var $ = function(id){ return document.getElementById(id); };
+  var tabCreateBtn = $('tabCreateBtn'), tabOpenBtn = $('tabOpenBtn');
+  var screenCreate = $('screenCreate'), screenOpen = $('screenOpen');
+  var modeLucky = $('modeLucky'), modeEqual = $('modeEqual'), modeHelp = $('modeHelp');
+  var createBtn = $('createBtn');
+  var envelopeBtn = $('envelopeBtn'), envelopeLabel = $('envelopeLabel'), envelopeSub = $('envelopeSub');
+  var progressFill = $('progressFill'), progressText = $('progressText'), progressAmt = $('progressAmt');
+  var feed = $('feed'), dropCode = $('dropCode');
+  var simulateBtn = $('simulateBtn'), resetBtn = $('resetBtn');
+  var luckiestWrap = $('luckiestWrap'), luckiestName = $('luckiestName'), luckiestAmt = $('luckiestAmt');
+  var codeTabConnect = $('codeTabConnect'), codeTabSend = $('codeTabSend');
+  var codeConnect = $('codeConnect'), codeSend = $('codeSend');
+
+  function setTab(which){
+    var creating = which === 'create';
+    tabCreateBtn.classList.toggle('active', creating);
+    tabOpenBtn.classList.toggle('active', !creating);
+    screenCreate.style.display = creating ? 'flex' : 'none';
+    screenOpen.style.display = creating ? 'none' : 'flex';
+  }
+  tabCreateBtn.addEventListener('click', function(){ setTab('create'); });
+  tabOpenBtn.addEventListener('click', function(){ if (state.slices.length) setTab('open'); });
+
+  modeLucky.addEventListener('click', function(){
+    state.mode = 'lucky';
+    modeLucky.classList.add('active'); modeEqual.classList.remove('active');
+    modeHelp.textContent = "Chaque part est un montant aléatoire — comme une vraie enveloppe porte-bonheur. Le total distribué reste exact au Luna près.";
+  });
+  modeEqual.addEventListener('click', function(){
+    state.mode = 'equal';
+    modeEqual.classList.add('active'); modeLucky.classList.remove('active');
+    modeHelp.textContent = "Chaque ami reçoit exactement la même part du montant total.";
+  });
+
+  codeTabConnect.addEventListener('click', function(){
+    codeTabConnect.classList.add('active'); codeTabSend.classList.remove('active');
+    codeConnect.style.display = 'block'; codeSend.style.display = 'none';
+  });
+  codeTabSend.addEventListener('click', function(){
+    codeTabSend.classList.add('active'); codeTabConnect.classList.remove('active');
+    codeSend.style.display = 'block'; codeConnect.style.display = 'none';
+  });
+
+  function renderProgress(){
+    var claimedCount = state.claimed.length;
+    var claimedAmt = state.claimed.reduce(function(a,c){ return a + c.amount; }, 0);
+    var pct = state.count ? (claimedCount/state.count)*100 : 0;
+    progressFill.style.width = pct + '%';
+    progressText.textContent = claimedCount + ' / ' + state.count + ' parts ouvertes';
+    progressAmt.textContent = fmt(claimedAmt/100000) + ' / ' + fmt(state.total/100000) + ' NIM';
+
+    var remaining = state.count - claimedCount;
+    if (remaining <= 0){
+      envelopeLabel.textContent = 'Drop épuisé';
+      envelopeSub.textContent = 'Toutes les parts ont été ouvertes';
+      envelopeBtn.disabled = true;
+      simulateBtn.disabled = true;
+    } else {
+      envelopeLabel.textContent = 'Toucher pour ouvrir';
+      envelopeSub.textContent = remaining + ' part' + (remaining>1?'s':'') + ' restante' + (remaining>1?'s':'');
+      simulateBtn.disabled = false;
+    }
+  }
+
+  function pushFeedItem(name, amount, isYou){
+    if (feed.querySelector('.feed-empty')) feed.innerHTML = '';
+    var item = document.createElement('div');
+    item.className = 'feed-item' + (isYou ? ' you' : '');
+    item.innerHTML = '<span class="who">' + (isYou ? 'Toi' : name) + '</span>' +
+      '<span class="amt num">+' + fmt(amount/100000) + ' NIM</span>';
+    feed.insertBefore(item, feed.firstChild);
+  }
+
+  function updateLuckiest(){
+    if (!state.claimed.length) return;
+    var best = state.claimed.reduce(function(a,b){ return b.amount > a.amount ? b : a; });
+    luckiestWrap.style.display = 'block';
+    luckiestName.textContent = best.name;
+    luckiestAmt.textContent = fmt(best.amount/100000);
+  }
+
+  function claimOne(isYou){
+    var remainingIdx = [];
+    for (var i=0;i<state.slices.length;i++) if (!state.claimed.some(function(c){return c.idx===i;})) remainingIdx.push(i);
+    if (!remainingIdx.length) return;
+    var idx = remainingIdx[Math.floor(Math.random()*remainingIdx.length)];
+    var amount = state.slices[idx];
+    var name = NAMES[Math.floor(Math.random()*NAMES.length)] + (Math.floor(Math.random()*90)+10);
+    var claim = { idx: idx, amount: amount, name: name, address: fakeAddress() };
+    state.claimed.push(claim);
+    pushFeedItem(name, amount, isYou);
+    renderProgress();
+    updateLuckiest();
+    burstConfetti(isYou ? 90 : 45);
+    if (state.claimed.length === state.count){
+      setTimeout(function(){ burstConfetti(160); }, 150);
+    }
+  }
+
+  envelopeBtn.addEventListener('click', function(){ claimOne(true); });
+  simulateBtn.addEventListener('click', function(){ claimOne(false); });
+
+  createBtn.addEventListener('click', function(){
+    var nim = parseFloat($('amt').value);
+    var count = parseInt($('slices').value, 10);
+    if (!nim || nim <= 0 || !count || count < 2){
+      $('amt').style.borderColor = 'var(--garnet)';
+      return;
+    }
+    var totalLuna = Math.round(nim * 100000);
+    state.total = totalLuna;
+    state.count = count;
+    state.slices = state.mode === 'lucky' ? luckySplit(totalLuna, count) : equalSplit(totalLuna, count);
+    state.claimed = [];
+    state.code = randomCode();
+    dropCode.textContent = 'Code : ' + state.code;
+    feed.innerHTML = '<p class="feed-empty">Personne n\'a encore ouvert le drop.</p>';
+    luckiestWrap.style.display = 'none';
+    envelopeBtn.disabled = false;
+    renderProgress();
+    setTab('open');
+  });
+
+  resetBtn.addEventListener('click', function(){
+    state.slices = []; state.claimed = []; state.total = 0; state.count = 0;
+    setTab('create');
+  });
+
+  // ---------- confetti ----------
+  var canvas = $('confetti'), ctx = canvas.getContext('2d');
+  var particles = [];
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function resizeCanvas(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+  var confettiColors = ['#f0b429','#e26a7a','#4fd6c7','#ffcc5c','#c8890a'];
+  function burstConfetti(count){
+    if (reduceMotion) return;
+    var originX = window.innerWidth/2, originY = window.innerHeight*0.38;
+    for (var i=0;i<count;i++){
+      particles.push({
+        x: originX, y: originY,
+        vx: (Math.random()-0.5)*9,
+        vy: (Math.random()*-9)-2,
+        size: 4+Math.random()*4,
+        color: confettiColors[Math.floor(Math.random()*confettiColors.length)],
+        rot: Math.random()*Math.PI,
+        vr: (Math.random()-0.5)*0.3,
+        life: 0
+      });
+    }
+  }
+  function tick(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    for (var i=particles.length-1;i>=0;i--){
+      var p = particles[i];
+      p.vy += 0.28; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life++;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = Math.max(0, 1 - p.life/90);
+      ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size*0.6);
+      ctx.restore();
+      if (p.life > 90 || p.y > canvas.height+40) particles.splice(i,1);
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+
+  // ---------- real Nimiq Pay detection (progressive enhancement) ----------
+  function tryConnectNimiqPay(){
+    if (!window.nimiqPay){ return; }
+    import('https://cdn.jsdelivr.net/npm/@nimiq/mini-app-sdk/+esm').then(function(mod){
+      return mod.init();
+    }).then(function(nimiq){
+      return nimiq.listAccounts().then(function(accounts){
+        state.connected = true;
+        state.creatorAddress = accounts && accounts[0];
+        $('statusText').textContent = 'Connecté à Nimiq Pay';
+        $('statusPill').classList.add('live');
+      });
+    }).catch(function(err){
+      console.warn('NIM Drop: Nimiq Pay SDK unavailable, staying in demo mode.', err);
+    });
+  }
+  tryConnectNimiqPay();
+
+  renderProgress();
+})();
+</script>
+</body>
+</html>
