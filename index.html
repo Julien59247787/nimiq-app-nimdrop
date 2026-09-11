@@ -766,8 +766,42 @@
   var state = {
     total: 0, count: 0, mode: 'equal',
     slices: [], claimed: [], code: '',
-    creatorAddress: null, connected: false
+    creatorAddress: null, connected: false,
+    dropId: null, clientRef: null
   };
+
+  function getClientRef(){
+    if (state.creatorAddress) return state.creatorAddress;
+    if (!state.clientRef){
+      state.clientRef = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ('anon-' + Math.random().toString(36).slice(2));
+    }
+    return state.clientRef;
+  }
+
+  // Server-backed claim-lock (avoids double-claims when several people open
+  // the same drop at once). Falls back to the local demo simulation below
+  // when no backend is reachable (e.g. this file previewed outside the
+  // validators' hosting) — the fetches below target relative paths, so they
+  // only resolve once the page is actually served from /miniapps/nim-drop/.
+  function apiCreateDrop(dropId, totalLuna, count, mode){
+    return fetch('/api/v2/nim-drop/create', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ drop_id: dropId, total_luna: totalLuna, count: count, mode: mode })
+    }).then(function(res){
+      if (!res.ok) throw new Error('create failed: ' + res.status);
+      return res.json();
+    });
+  }
+
+  function apiClaim(dropId, claimantRef){
+    return fetch('/api/v2/nim-drop/claim', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ drop_id: dropId, claimant_ref: claimantRef })
+    }).then(function(res){
+      if (!res.ok) throw new Error('claim failed: ' + res.status);
+      return res.json();
+    });
+  }
 
   var NAMES = ["Nimiqnaut", "AlbatrossFan", "LunaLover", "GarnetGlow", "ZeroFeeZoe", "BlockBird",
     "StakerSam", "HodlHanna", "ValidatorVic", "GoldenGarnet", "SwiftShard", "ConsensusCat",
@@ -901,14 +935,8 @@
     luckiestAmt.textContent = fmt(best.amount/100000);
   }
 
-  function claimOne(isYou){
-    var remainingIdx = [];
-    for (var i=0;i<state.slices.length;i++) if (!state.claimed.some(function(c){return c.idx===i;})) remainingIdx.push(i);
-    if (!remainingIdx.length) return;
-    var idx = remainingIdx[Math.floor(Math.random()*remainingIdx.length)];
-    var amount = state.slices[idx];
-    var name = NAMES[Math.floor(Math.random()*NAMES.length)] + (Math.floor(Math.random()*90)+10);
-    var claim = { idx: idx, amount: amount, name: name, address: fakeAddress() };
+  function recordClaim(amount, name, isYou){
+    var claim = { idx: state.claimed.length, amount: amount, name: name, address: getClientRef() };
     state.claimed.push(claim);
     pushFeedItem(name, amount, isYou);
     renderProgress();
@@ -917,6 +945,38 @@
     if (state.claimed.length === state.count){
       setTimeout(function(){ burstConfetti(160); }, 150);
     }
+  }
+
+  // Local-only simulation — used when there's no reachable claim-lock
+  // service (e.g. previewing this file outside the validators' hosting).
+  function claimOneLocal(isYou){
+    var remainingIdx = [];
+    for (var i=0;i<state.slices.length;i++) if (!state.claimed.some(function(c){return c.idx===i;})) remainingIdx.push(i);
+    if (!remainingIdx.length) return;
+    var idx = remainingIdx[Math.floor(Math.random()*remainingIdx.length)];
+    var amount = state.slices[idx];
+    var name = NAMES[Math.floor(Math.random()*NAMES.length)] + (Math.floor(Math.random()*90)+10);
+    recordClaim(amount, isYou ? t('app.you') : name, isYou);
+  }
+
+  // Real claim-lock — coordinates concurrent claims server-side (no funds,
+  // just a lock on which share is taken). Falls back to the local
+  // simulation if the drop was never created server-side or the API is
+  // unreachable, so the demo keeps working everywhere.
+  function claimOne(isYou){
+    if (!state.dropId){ claimOneLocal(isYou); return; }
+    apiClaim(state.dropId, getClientRef()).then(function(res){
+      if (!res.available){
+        envelopeSub.textContent = t('app.envelopeDoneSub');
+        envelopeBtn.disabled = true;
+        return;
+      }
+      var name = NAMES[Math.floor(Math.random()*NAMES.length)] + (Math.floor(Math.random()*90)+10);
+      recordClaim(res.amount_luna, isYou ? t('app.you') : name, isYou);
+    }).catch(function(err){
+      console.warn('NIM Drop: claim-lock unreachable, falling back to local simulation.', err);
+      claimOneLocal(isYou);
+    });
   }
 
   envelopeBtn.addEventListener('click', function(){ claimOne(true); });
@@ -934,6 +994,7 @@
     state.count = count;
     state.slices = state.mode === 'lucky' ? luckySplit(totalLuna, count) : equalSplit(totalLuna, count);
     state.claimed = [];
+    state.dropId = null;
     state.code = randomCode();
     dropCode.textContent = t('app.codeLabel') + ' : ' + state.code;
     feed.innerHTML = '<p class="feed-empty">' + t('app.feedEmpty') + '</p>';
@@ -941,10 +1002,19 @@
     envelopeBtn.disabled = false;
     renderProgress();
     setTab('open');
+    // Register the drop server-side so claims are coordinated even if
+    // several friends open it at once. Non-blocking: the UI above already
+    // works locally, this just upgrades it to the real claim-lock once
+    // (if) it resolves.
+    apiCreateDrop(state.code, totalLuna, count, state.mode).then(function(res){
+      state.dropId = res.drop_id || state.code;
+    }).catch(function(err){
+      console.warn('NIM Drop: claim-lock create unreachable, staying in local demo mode for this drop.', err);
+    });
   });
 
   resetBtn.addEventListener('click', function(){
-    state.slices = []; state.claimed = []; state.total = 0; state.count = 0;
+    state.slices = []; state.claimed = []; state.total = 0; state.count = 0; state.dropId = null;
     setTab('create');
   });
 
