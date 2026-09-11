@@ -407,12 +407,12 @@
               <div class="field">
                 <label>Répartition</label>
                 <div class="mode-toggle">
-                  <button type="button" id="modeLucky" class="active">Surprise</button>
-                  <button type="button" id="modeEqual">Égale</button>
+                  <button type="button" id="modeLucky">Surprise</button>
+                  <button type="button" id="modeEqual" class="active">Égale</button>
                 </div>
               </div>
             </div>
-            <p class="helptext" id="modeHelp">Chaque part est un montant aléatoire — comme une vraie enveloppe porte-bonheur. Le total distribué reste exact au Luna près.</p>
+            <p class="helptext" id="modeHelp">Chaque ami reçoit exactement la même part du montant total.</p>
             <button class="create-btn" id="createBtn">Créer le drop 🧧</button>
             <p class="helptext">Aucune enveloppe n'est "prépayée" à une cagnotte : ta NIM ne quitte ton wallet qu'au moment où chaque ami ouvre sa part, avec ta confirmation native à chaque envoi.</p>
           </div>
@@ -478,7 +478,7 @@
       </div>
       <div class="step">
         <span class="n">03</span>
-        <h3>Chacun tente sa chance</h3>
+        <h3>Chacun reçoit sa part</h3>
         <p>Premier arrivé, premier servi : chaque ouverture déclenche un envoi NIM direct et instantané, confirmé nativement par ton wallet.</p>
       </div>
     </div>
@@ -588,7 +588,7 @@
 
   // ---------- state ----------
   var state = {
-    total: 0, count: 0, mode: 'lucky',
+    total: 0, count: 0, mode: 'equal',
     slices: [], claimed: [], code: '',
     creatorAddress: null, connected: false
   };
