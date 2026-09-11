@@ -361,23 +361,23 @@
 
 <header class="top">
   <div class="brand"><span class="mark">🧧</span> NIM Drop</div>
-  <div class="chip">Nimiq Mini Apps Competition · Cycle II</div>
+  <div class="chip" data-i18n="header.chip">Nimiq Mini Apps Competition · Cycle II</div>
 </header>
 
 <section class="hero wrap">
   <div class="hero-grid">
     <div>
-      <div class="eyebrow">Un mini app pour Nimiq Pay</div>
-      <h1>L'enveloppe rouge porte-bonheur, <em>réinventée</em> sans frais ni serveur.</h1>
-      <p class="lead">NIM Drop transforme n'importe quel groupe en jeu : tu glisses un montant en NIM dans une enveloppe numérique, tu fixes le nombre de parts, et tes amis se battent pour l'ouvrir. Chaque envoi est direct, instantané et à coût nul — grâce au protocole Nimiq.</p>
+      <div class="eyebrow" data-i18n="hero.eyebrow">Un mini app pour Nimiq Pay</div>
+      <h1 data-i18n="hero.title">L'enveloppe rouge porte-bonheur, <em>réinventée</em> sans frais ni serveur.</h1>
+      <p class="lead" data-i18n="hero.lead">NIM Drop transforme n'importe quel groupe en jeu : tu glisses un montant en NIM dans une enveloppe numérique, tu fixes le nombre de parts, et tes amis se battent pour l'ouvrir. Chaque envoi est direct, instantané et à coût nul — grâce au protocole Nimiq.</p>
       <div class="hero-cta">
-        <a href="#demo" class="btn btn-primary">🧧 Essayer la démo</a>
-        <a href="#why" class="btn btn-ghost">Pourquoi Nimiq ?</a>
+        <a href="#demo" class="btn btn-primary" data-i18n="hero.ctaDemo">🧧 Essayer la démo</a>
+        <a href="#why" class="btn btn-ghost" data-i18n="hero.ctaWhy">Pourquoi Nimiq ?</a>
       </div>
       <div class="stat-row">
-        <div class="stat"><b class="num">0%</b><span>Frais de transaction</span></div>
-        <div class="stat"><b class="num">~1s</b><span>Finalité des paiements</span></div>
-        <div class="stat"><b class="num">0</b><span>Clé privée détenue par l'app</span></div>
+        <div class="stat"><b class="num">0%</b><span data-i18n="hero.stat1">Frais de transaction</span></div>
+        <div class="stat"><b class="num">~1s</b><span data-i18n="hero.stat2">Finalité des paiements</span></div>
+        <div class="stat"><b class="num">0</b><span data-i18n="hero.stat3">Clé privée détenue par l'app</span></div>
       </div>
     </div>
     <div class="phone-stage" id="demo">
@@ -386,71 +386,71 @@
           <div class="phone-notch"></div>
           <div class="app-bar">
             <span class="app-name">🧧 NIM Drop</span>
-            <span class="status-pill" id="statusPill"><span class="dot"></span><span id="statusText">Mode démo</span></span>
+            <span class="status-pill" id="statusPill"><span class="dot"></span><span id="statusText" data-i18n="app.statusDemo">Mode démo</span></span>
           </div>
           <div class="tabs">
-            <button class="tab-btn active" id="tabCreateBtn">Créer</button>
-            <button class="tab-btn" id="tabOpenBtn">Ouvrir</button>
+            <button class="tab-btn active" id="tabCreateBtn" data-i18n="app.tabCreate">Créer</button>
+            <button class="tab-btn" id="tabOpenBtn" data-i18n="app.tabOpen">Ouvrir</button>
           </div>
 
           <!-- CREATE SCREEN -->
           <div class="screen" id="screenCreate">
             <div class="field">
-              <label for="amt">Montant total (NIM)</label>
+              <label for="amt" data-i18n="app.amountLabel">Montant total (NIM)</label>
               <input type="number" id="amt" value="50" min="1" step="1" inputmode="decimal" />
             </div>
             <div class="row2">
               <div class="field">
-                <label for="slices">Nombre d'amis</label>
+                <label for="slices" data-i18n="app.friendsLabel">Nombre d'amis</label>
                 <input type="number" id="slices" value="6" min="2" max="20" step="1" />
               </div>
               <div class="field">
-                <label>Répartition</label>
+                <label data-i18n="app.modeLabel">Répartition</label>
                 <div class="mode-toggle">
-                  <button type="button" id="modeLucky">Surprise</button>
-                  <button type="button" id="modeEqual" class="active">Égale</button>
+                  <button type="button" id="modeLucky" data-i18n="app.modeLucky">Surprise</button>
+                  <button type="button" id="modeEqual" class="active" data-i18n="app.modeEqual">Égale</button>
                 </div>
               </div>
             </div>
-            <p class="helptext" id="modeHelp">Chaque ami reçoit exactement la même part du montant total.</p>
-            <button class="create-btn" id="createBtn">Créer le drop 🧧</button>
-            <p class="helptext">Aucune enveloppe n'est "prépayée" à une cagnotte : ta NIM ne quitte ton wallet qu'au moment où chaque ami ouvre sa part, avec ta confirmation native à chaque envoi.</p>
+            <p class="helptext" id="modeHelp" data-i18n="app.modeHelpEqual">Chaque ami reçoit exactement la même part du montant total.</p>
+            <button class="create-btn" id="createBtn" data-i18n="app.createBtn">Créer le drop 🧧</button>
+            <p class="helptext" data-i18n="app.createHelptext">Aucune enveloppe n'est "prépayée" à une cagnotte : ta NIM ne quitte ton wallet qu'au moment où chaque ami ouvre sa part, avec ta confirmation native à chaque envoi.</p>
           </div>
 
           <!-- OPEN / LIVE SCREEN -->
           <div class="screen" id="screenOpen" style="display:none;">
             <div class="stay-online-banner">
               <span class="stay-online-icon">📲</span>
-              <span>Reste sur cette page : chaque envoi part de ton wallet, en direct.</span>
+              <span data-i18n="app.stayOnline">Reste sur cette page : chaque envoi part de ton wallet, en direct.</span>
             </div>
             <div class="envelope-wrap">
-              <span class="code-badge" id="dropCode">Code : ——</span>
+              <span class="code-badge" id="dropCode"><span data-i18n="app.codeLabel">Code</span> : ——</span>
               <button class="envelope" id="envelopeBtn">
                 <span class="seal">🧧</span>
-                <span class="tap-label" id="envelopeLabel">Toucher pour ouvrir</span>
-                <span class="amt-label" id="envelopeSub">Un ami peut l'ouvrir</span>
+                <span class="tap-label" id="envelopeLabel" data-i18n="app.envelopeTap">Toucher pour ouvrir</span>
+                <span class="amt-label" id="envelopeSub" data-i18n="app.envelopeSub">Un ami peut l'ouvrir</span>
               </button>
               <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
               <div class="progress-caption">
-                <span id="progressText">0 / 0 parts ouvertes</span>
+                <span id="progressText">0 / 0</span>
                 <span id="progressAmt" class="num">0 / 0 NIM</span>
               </div>
             </div>
 
-            <button class="simulate-btn" id="simulateBtn">➕ Simuler l'ouverture d'un ami</button>
+            <button class="simulate-btn" id="simulateBtn" data-i18n="app.simulateBtn">➕ Simuler l'ouverture d'un ami</button>
 
             <div id="luckiestWrap" style="display:none;">
               <div class="luckiest">
                 <span class="crown">👑</span>
-                <span>Part la plus chanceuse : <b id="luckiestName">—</b> avec <b class="num" id="luckiestAmt">—</b> NIM</span>
+                <span data-i18n="app.luckiestPrefix">Part la plus chanceuse :</span> <b id="luckiestName">—</b> <span data-i18n="app.luckiestWith">avec</span> <b class="num" id="luckiestAmt">—</b> NIM
               </div>
             </div>
 
             <div class="feed" id="feed">
-              <p class="feed-empty">Personne n'a encore ouvert le drop.</p>
+              <p class="feed-empty" data-i18n="app.feedEmpty">Personne n'a encore ouvert le drop.</p>
             </div>
 
-            <button class="reset-btn" id="resetBtn">↺ Recommencer la démo</button>
+            <button class="reset-btn" id="resetBtn" data-i18n="app.resetBtn">↺ Recommencer la démo</button>
           </div>
         </div>
       </div>
@@ -461,25 +461,25 @@
 <section class="section" id="how">
   <div class="wrap">
     <div class="section-head">
-      <div class="eyebrow">Comment ça marche</div>
-      <h2>Trois étapes, zéro friction</h2>
-      <p>Pensé pour un groupe Telegram, une soirée entre amis, ou une communauté crypto qui veut fêter quelque chose.</p>
+      <div class="eyebrow" data-i18n="how.eyebrow">Comment ça marche</div>
+      <h2 data-i18n="how.title">Trois étapes, zéro friction</h2>
+      <p data-i18n="how.lead">Pensé pour un groupe Telegram, une soirée entre amis, ou une communauté crypto qui veut fêter quelque chose.</p>
     </div>
     <div class="steps">
       <div class="step">
         <span class="n">01</span>
-        <h3>Tu composes le drop</h3>
-        <p>Montant total en NIM, nombre de parts, répartition égale ou "surprise" à la manière d'une enveloppe rouge traditionnelle.</p>
+        <h3 data-i18n="how.step1Title">Tu composes le drop</h3>
+        <p data-i18n="how.step1Body">Montant total en NIM, nombre de parts, répartition égale ou "surprise" à la manière d'une enveloppe rouge traditionnelle.</p>
       </div>
       <div class="step">
         <span class="n">02</span>
-        <h3>Tu partages le lien</h3>
-        <p>Un lien Nimiq Pay ou un QR code circule dans le groupe. Chaque membre ouvre NIM Drop directement dans son wallet, sans rien installer.</p>
+        <h3 data-i18n="how.step2Title">Tu partages le lien</h3>
+        <p data-i18n="how.step2Body">Un lien Nimiq Pay ou un QR code circule dans le groupe. Chaque membre ouvre NIM Drop directement dans son wallet, sans rien installer.</p>
       </div>
       <div class="step">
         <span class="n">03</span>
-        <h3>Chacun reçoit sa part</h3>
-        <p>Premier arrivé, premier servi : chaque ouverture déclenche un envoi NIM direct et instantané, confirmé nativement par ton wallet.</p>
+        <h3 data-i18n="how.step3Title">Chacun reçoit sa part</h3>
+        <p data-i18n="how.step3Body">Premier arrivé, premier servi : chaque ouverture déclenche un envoi NIM direct et instantané, confirmé nativement par ton wallet.</p>
       </div>
     </div>
   </div>
@@ -489,18 +489,18 @@
   <div class="wrap why-grid">
     <div class="why-item">
       <div class="big num">0 NIM</div>
-      <h4>Aucun frais, même sur 20 envois</h4>
-      <p>Sur la plupart des chaînes, distribuer 20 micro-paiements coûte plus cher en gas que le cadeau lui-même. Sur Nimiq, le protocole reste feeless — le jeu redevient amusant.</p>
+      <h4 data-i18n="why.item1Title">Aucun frais, même sur 20 envois</h4>
+      <p data-i18n="why.item1Body">Sur la plupart des chaînes, distribuer 20 micro-paiements coûte plus cher en gas que le cadeau lui-même. Sur Nimiq, le protocole reste feeless — le jeu redevient amusant.</p>
     </div>
     <div class="why-item">
       <div class="big num">~1 sec</div>
-      <h4>Confirmation quasi instantanée</h4>
-      <p>Albatross finalise les blocs en une seconde. L'enveloppe s'ouvre, la NIM arrive : pas d'attente, pas de rechargement de page.</p>
+      <h4 data-i18n="why.item2Title">Confirmation quasi instantanée</h4>
+      <p data-i18n="why.item2Body">Albatross finalise les blocs en une seconde. L'enveloppe s'ouvre, la NIM arrive : pas d'attente, pas de rechargement de page.</p>
     </div>
     <div class="why-item">
-      <div class="big">Zéro custody</div>
-      <h4>NIM Drop ne détient jamais tes fonds</h4>
-      <p>Aucune cagnotte intermédiaire. Chaque envoi part directement du wallet du créateur vers celui de l'ami, confirmé via le provider Nimiq Pay natif.</p>
+      <div class="big" data-i18n="why.item3Big">Zéro custody</div>
+      <h4 data-i18n="why.item3Title">NIM Drop ne détient jamais tes fonds</h4>
+      <p data-i18n="why.item3Body">Aucune cagnotte intermédiaire. Chaque envoi part directement du wallet du créateur vers celui de l'ami, confirmé via le provider Nimiq Pay natif.</p>
     </div>
   </div>
 </section>
@@ -508,22 +508,22 @@
 <section class="section" id="faq">
   <div class="wrap">
     <div class="section-head">
-      <div class="eyebrow">Qui paie quoi ?</div>
-      <h2>Aucune cagnotte, aucun intermédiaire</h2>
-      <p>Le point qui surprend le plus au premier abord — voici exactement ce qui se passe à chaque étape.</p>
+      <div class="eyebrow" data-i18n="faq.eyebrow">Qui paie quoi ?</div>
+      <h2 data-i18n="faq.title">Aucune cagnotte, aucun intermédiaire</h2>
+      <p data-i18n="faq.lead">Le point qui surprend le plus au premier abord — voici exactement ce qui se passe à chaque étape.</p>
     </div>
     <div class="faq-list">
       <div class="faq-item">
-        <h3>Il n'y a pas de cagnotte : qui paie, alors ?</h3>
-        <p><b>Le créateur du drop</b>, à chaque ouverture, depuis son propre wallet. Rien n'est mis de côté au moment de la création : quand un ami touche l'enveloppe, ça déclenche un envoi NIM direct — du wallet du créateur vers celui de l'ami — que le créateur confirme lui-même, native, un par un.</p>
+        <h3 data-i18n="faq.q1">Il n'y a pas de cagnotte : qui paie, alors ?</h3>
+        <p data-i18n="faq.a1"><b>Le créateur du drop</b>, à chaque ouverture, depuis son propre wallet. Rien n'est mis de côté au moment de la création : quand un ami touche l'enveloppe, ça déclenche un envoi NIM direct — du wallet du créateur vers celui de l'ami — que le créateur confirme lui-même, native, un par un.</p>
       </div>
       <div class="faq-item">
-        <h3>Et les frais de transaction ?</h3>
-        <p>Sur Nimiq, ils sont à <b>0 dans l'immense majorité des cas</b> — le réseau est feeless par design, et le SDK choisit automatiquement le frais le plus bas possible, souvent nul. Ni le créateur ni les amis ne paient de frais réseau : seul le montant du cadeau lui-même circule.</p>
+        <h3 data-i18n="faq.q2">Et les frais de transaction ?</h3>
+        <p data-i18n="faq.a2">Sur Nimiq, ils sont à <b>0 dans l'immense majorité des cas</b> — le réseau est feeless par design, et le SDK choisit automatiquement le frais le plus bas possible, souvent nul. Ni le créateur ni les amis ne paient de frais réseau : seul le montant du cadeau lui-même circule.</p>
       </div>
       <div class="faq-item">
-        <h3>Est-ce que je dois garder l'app ouverte en tant que créateur ?</h3>
-        <p><b>Oui.</b> Comme chaque envoi part de ton wallet à toi et demande ta confirmation, ton app doit rester ouverte pendant que tes amis ouvrent leurs parts — ce n'est pas un lien qui continue de fonctionner tout seul si tu fermes l'app. C'est le prix du "zéro custody" : personne d'autre que toi ne peut jamais envoyer tes fonds à ta place.</p>
+        <h3 data-i18n="faq.q3">Est-ce que je dois garder l'app ouverte en tant que créateur ?</h3>
+        <p data-i18n="faq.a3"><b>Oui.</b> Comme chaque envoi part de ton wallet à toi et demande ta confirmation, ton app doit rester ouverte pendant que tes amis ouvrent leurs parts — ce n'est pas un lien qui continue de fonctionner tout seul si tu fermes l'app. C'est le prix du "zéro custody" : personne d'autre que toi ne peut jamais envoyer tes fonds à ta place.</p>
       </div>
     </div>
   </div>
@@ -532,20 +532,20 @@
 <section class="section">
   <div class="wrap tech">
     <div>
-      <div class="eyebrow">Intégration technique</div>
-      <h2>Construit sur le vrai Mini App SDK</h2>
-      <p>Cette démo tourne en mode simulé pour être testable dans n'importe quel navigateur. À l'intérieur de Nimiq Pay, elle bascule automatiquement sur les vrais appels du SDK — même code, vraie blockchain.</p>
+      <div class="eyebrow" data-i18n="tech.eyebrow">Intégration technique</div>
+      <h2 data-i18n="tech.title">Construit sur le vrai Mini App SDK</h2>
+      <p data-i18n="tech.lead">Cette démo tourne en mode simulé pour être testable dans n'importe quel navigateur. À l'intérieur de Nimiq Pay, elle bascule automatiquement sur les vrais appels du SDK — même code, vraie blockchain.</p>
       <ul>
-        <li>Détection automatique de <code>window.nimiqPay</code> au chargement</li>
-        <li>Adresse du créateur lue via <code>listAccounts()</code></li>
-        <li>Chaque ouverture déclenche <code>sendBasicTransaction()</code></li>
-        <li>Repli gracieux en mode démo hors de Nimiq Pay</li>
+        <li data-i18n="tech.li1">Détection automatique de <code>window.nimiqPay</code> au chargement</li>
+        <li data-i18n="tech.li2">Adresse du créateur lue via <code>listAccounts()</code></li>
+        <li data-i18n="tech.li3">Chaque ouverture déclenche <code>sendBasicTransaction()</code></li>
+        <li data-i18n="tech.li4">Repli gracieux en mode démo hors de Nimiq Pay</li>
       </ul>
     </div>
     <div class="code-panel">
       <div class="code-tabbar">
-        <button class="active" id="codeTabConnect">Connexion</button>
-        <button id="codeTabSend">Envoi d'une part</button>
+        <button class="active" id="codeTabConnect" data-i18n="tech.tabConnect">Connexion</button>
+        <button id="codeTabSend" data-i18n="tech.tabSend">Envoi d'une part</button>
       </div>
       <pre class="code" id="codeConnect"><span class="c">// Détection + connexion au wallet Nimiq Pay</span>
 <span class="k">import</span> { init } <span class="k">from</span> <span class="s">'@nimiq/mini-app-sdk'</span>
@@ -570,12 +570,12 @@
   <div class="wrap footer-grid">
     <div>
       <div class="brand">🧧 NIM Drop</div>
-      <p>Projet conçu pour la Nimiq Mini Apps Competition, Cycle II (24 août – 18 septembre 2026). Prototype ouvert, sans backend, pensé pour être hébergé et chargé dans Nimiq Pay.</p>
+      <p data-i18n="footer.desc">Projet conçu pour la Nimiq Mini Apps Competition, Cycle II (24 août – 18 septembre 2026). Prototype ouvert, sans backend, pensé pour être hébergé et chargé dans Nimiq Pay.</p>
     </div>
     <div class="meta">
-      <div>Réseau : Nimiq (NIM)</div>
+      <div><span data-i18n="footer.network">Réseau</span> : Nimiq (NIM)</div>
       <div>SDK : @nimiq/mini-app-sdk</div>
-      <div>Statut : démo interactive</div>
+      <div><span data-i18n="footer.status">Statut</span> : <span data-i18n="footer.statusValue">démo interactive</span></div>
     </div>
   </div>
 </footer>
@@ -585,6 +585,182 @@
   "use strict";
 
   // ---------- theme handled purely by CSS tokens ----------
+
+  // ---------- i18n ----------
+  var SUPPORTED_LANGS = ['fr', 'en'];
+  var T = {
+    fr: {
+      'header.chip': 'Nimiq Mini Apps Competition · Cycle II',
+      'hero.eyebrow': 'Un mini app pour Nimiq Pay',
+      'hero.title': 'L\'enveloppe rouge porte-bonheur, <em>réinventée</em> sans frais ni serveur.',
+      'hero.lead': 'NIM Drop transforme n\'importe quel groupe en jeu : tu glisses un montant en NIM dans une enveloppe numérique, tu fixes le nombre de parts, et tes amis se battent pour l\'ouvrir. Chaque envoi est direct, instantané et à coût nul — grâce au protocole Nimiq.',
+      'hero.ctaDemo': '🧧 Essayer la démo',
+      'hero.ctaWhy': 'Pourquoi Nimiq ?',
+      'hero.stat1': 'Frais de transaction',
+      'hero.stat2': 'Finalité des paiements',
+      'hero.stat3': 'Clé privée détenue par l\'app',
+      'app.statusDemo': 'Mode démo',
+      'app.statusLive': 'Connecté à Nimiq Pay',
+      'app.tabCreate': 'Créer',
+      'app.tabOpen': 'Ouvrir',
+      'app.amountLabel': 'Montant total (NIM)',
+      'app.friendsLabel': 'Nombre d\'amis',
+      'app.modeLabel': 'Répartition',
+      'app.modeLucky': 'Surprise',
+      'app.modeEqual': 'Égale',
+      'app.modeHelpEqual': 'Chaque ami reçoit exactement la même part du montant total.',
+      'app.modeHelpLucky': 'Chaque part est un montant aléatoire — comme une vraie enveloppe porte-bonheur. Le total distribué reste exact au Luna près.',
+      'app.createBtn': 'Créer le drop 🧧',
+      'app.createHelptext': 'Aucune enveloppe n\'est "prépayée" à une cagnotte : ta NIM ne quitte ton wallet qu\'au moment où chaque ami ouvre sa part, avec ta confirmation native à chaque envoi.',
+      'app.stayOnline': 'Reste sur cette page : chaque envoi part de ton wallet, en direct.',
+      'app.codeLabel': 'Code',
+      'app.envelopeTap': 'Toucher pour ouvrir',
+      'app.envelopeSub': 'Un ami peut l\'ouvrir',
+      'app.envelopeDone': 'Drop épuisé',
+      'app.envelopeDoneSub': 'Toutes les parts ont été ouvertes',
+      'app.partsOpened': 'parts ouvertes',
+      'app.partRemaining': 'part restante',
+      'app.partsRemaining': 'parts restantes',
+      'app.simulateBtn': '➕ Simuler l\'ouverture d\'un ami',
+      'app.luckiestPrefix': 'Part la plus chanceuse :',
+      'app.luckiestWith': 'avec',
+      'app.feedEmpty': 'Personne n\'a encore ouvert le drop.',
+      'app.you': 'Toi',
+      'app.resetBtn': '↺ Recommencer la démo',
+      'how.eyebrow': 'Comment ça marche',
+      'how.title': 'Trois étapes, zéro friction',
+      'how.lead': 'Pensé pour un groupe Telegram, une soirée entre amis, ou une communauté crypto qui veut fêter quelque chose.',
+      'how.step1Title': 'Tu composes le drop',
+      'how.step1Body': 'Montant total en NIM, nombre de parts, répartition égale ou "surprise" à la manière d\'une enveloppe rouge traditionnelle.',
+      'how.step2Title': 'Tu partages le lien',
+      'how.step2Body': 'Un lien Nimiq Pay ou un QR code circule dans le groupe. Chaque membre ouvre NIM Drop directement dans son wallet, sans rien installer.',
+      'how.step3Title': 'Chacun reçoit sa part',
+      'how.step3Body': 'Premier arrivé, premier servi : chaque ouverture déclenche un envoi NIM direct et instantané, confirmé nativement par ton wallet.',
+      'why.item1Title': 'Aucun frais, même sur 20 envois',
+      'why.item1Body': 'Sur la plupart des chaînes, distribuer 20 micro-paiements coûte plus cher en gas que le cadeau lui-même. Sur Nimiq, le protocole reste feeless — le jeu redevient amusant.',
+      'why.item2Title': 'Confirmation quasi instantanée',
+      'why.item2Body': 'Albatross finalise les blocs en une seconde. L\'enveloppe s\'ouvre, la NIM arrive : pas d\'attente, pas de rechargement de page.',
+      'why.item3Big': 'Zéro custody',
+      'why.item3Title': 'NIM Drop ne détient jamais tes fonds',
+      'why.item3Body': 'Aucune cagnotte intermédiaire. Chaque envoi part directement du wallet du créateur vers celui de l\'ami, confirmé via le provider Nimiq Pay natif.',
+      'faq.eyebrow': 'Qui paie quoi ?',
+      'faq.title': 'Aucune cagnotte, aucun intermédiaire',
+      'faq.lead': 'Le point qui surprend le plus au premier abord — voici exactement ce qui se passe à chaque étape.',
+      'faq.q1': 'Il n\'y a pas de cagnotte : qui paie, alors ?',
+      'faq.a1': '<b>Le créateur du drop</b>, à chaque ouverture, depuis son propre wallet. Rien n\'est mis de côté au moment de la création : quand un ami touche l\'enveloppe, ça déclenche un envoi NIM direct — du wallet du créateur vers celui de l\'ami — que le créateur confirme lui-même, native, un par un.',
+      'faq.q2': 'Et les frais de transaction ?',
+      'faq.a2': 'Sur Nimiq, ils sont à <b>0 dans l\'immense majorité des cas</b> — le réseau est feeless par design, et le SDK choisit automatiquement le frais le plus bas possible, souvent nul. Ni le créateur ni les amis ne paient de frais réseau : seul le montant du cadeau lui-même circule.',
+      'faq.q3': 'Est-ce que je dois garder l\'app ouverte en tant que créateur ?',
+      'faq.a3': '<b>Oui.</b> Comme chaque envoi part de ton wallet à toi et demande ta confirmation, ton app doit rester ouverte pendant que tes amis ouvrent leurs parts — ce n\'est pas un lien qui continue de fonctionner tout seul si tu fermes l\'app. C\'est le prix du "zéro custody" : personne d\'autre que toi ne peut jamais envoyer tes fonds à ta place.',
+      'tech.eyebrow': 'Intégration technique',
+      'tech.title': 'Construit sur le vrai Mini App SDK',
+      'tech.lead': 'Cette démo tourne en mode simulé pour être testable dans n\'importe quel navigateur. À l\'intérieur de Nimiq Pay, elle bascule automatiquement sur les vrais appels du SDK — même code, vraie blockchain.',
+      'tech.li1': 'Détection automatique de <code>window.nimiqPay</code> au chargement',
+      'tech.li2': 'Adresse du créateur lue via <code>listAccounts()</code>',
+      'tech.li3': 'Chaque ouverture déclenche <code>sendBasicTransaction()</code>',
+      'tech.li4': 'Repli gracieux en mode démo hors de Nimiq Pay',
+      'tech.tabConnect': 'Connexion',
+      'tech.tabSend': 'Envoi d\'une part',
+      'footer.desc': 'Projet conçu pour la Nimiq Mini Apps Competition, Cycle II (24 août – 18 septembre 2026). Prototype ouvert, sans backend, pensé pour être hébergé et chargé dans Nimiq Pay.',
+      'footer.network': 'Réseau',
+      'footer.status': 'Statut',
+      'footer.statusValue': 'démo interactive'
+    },
+    en: {
+      'header.chip': 'Nimiq Mini Apps Competition · Cycle II',
+      'hero.eyebrow': 'A mini app for Nimiq Pay',
+      'hero.title': 'The lucky red envelope, <em>reinvented</em> with no fees and no server.',
+      'hero.lead': 'NIM Drop turns any group into a game: drop a NIM amount into a digital envelope, set the number of shares, and let your friends race to open it. Every payout is direct, instant, and costs nothing — thanks to the Nimiq protocol.',
+      'hero.ctaDemo': '🧧 Try the demo',
+      'hero.ctaWhy': 'Why Nimiq?',
+      'hero.stat1': 'Transaction fees',
+      'hero.stat2': 'Payment finality',
+      'hero.stat3': 'Private key held by the app',
+      'app.statusDemo': 'Demo mode',
+      'app.statusLive': 'Connected to Nimiq Pay',
+      'app.tabCreate': 'Create',
+      'app.tabOpen': 'Open',
+      'app.amountLabel': 'Total amount (NIM)',
+      'app.friendsLabel': 'Number of friends',
+      'app.modeLabel': 'Split',
+      'app.modeLucky': 'Surprise',
+      'app.modeEqual': 'Equal',
+      'app.modeHelpEqual': 'Every friend receives exactly the same share of the total amount.',
+      'app.modeHelpLucky': 'Each share is a random amount — just like a real lucky envelope. The total distributed stays exact down to the Luna.',
+      'app.createBtn': 'Create the drop 🧧',
+      'app.createHelptext': 'No envelope is "pre-funded" into a pool: your NIM only leaves your wallet the moment each friend opens their share, with your native confirmation on every send.',
+      'app.stayOnline': 'Stay on this page: every send comes straight from your wallet, live.',
+      'app.codeLabel': 'Code',
+      'app.envelopeTap': 'Tap to open',
+      'app.envelopeSub': 'A friend can open it',
+      'app.envelopeDone': 'Drop empty',
+      'app.envelopeDoneSub': 'All shares have been opened',
+      'app.partsOpened': 'shares opened',
+      'app.partRemaining': 'share left',
+      'app.partsRemaining': 'shares left',
+      'app.simulateBtn': '➕ Simulate a friend opening it',
+      'app.luckiestPrefix': 'Luckiest share:',
+      'app.luckiestWith': 'with',
+      'app.feedEmpty': 'No one has opened the drop yet.',
+      'app.you': 'You',
+      'app.resetBtn': '↺ Restart the demo',
+      'how.eyebrow': 'How it works',
+      'how.title': 'Three steps, zero friction',
+      'how.lead': 'Built for a Telegram group, a night out with friends, or any crypto community celebrating something.',
+      'how.step1Title': 'You compose the drop',
+      'how.step1Body': 'Total amount in NIM, number of shares, equal or "surprise" split in the style of a traditional red envelope.',
+      'how.step2Title': 'You share the link',
+      'how.step2Body': 'A Nimiq Pay link or QR code circulates in the group. Each member opens NIM Drop directly in their wallet, nothing to install.',
+      'how.step3Title': 'Everyone gets their share',
+      'how.step3Body': 'First come, first served: each opening triggers a direct, instant NIM send, natively confirmed by your wallet.',
+      'why.item1Title': 'No fees, even on 20 sends',
+      'why.item1Body': 'On most chains, distributing 20 micro-payments costs more in gas than the gift itself. On Nimiq, the protocol stays feeless — the game stays fun.',
+      'why.item2Title': 'Near-instant confirmation',
+      'why.item2Body': 'Albatross finalizes blocks in one second. The envelope opens, the NIM arrives: no waiting, no page refresh.',
+      'why.item3Big': 'Zero custody',
+      'why.item3Title': 'NIM Drop never holds your funds',
+      'why.item3Body': 'No intermediate pool. Every send goes straight from the creator\'s wallet to the friend\'s, confirmed through the native Nimiq Pay provider.',
+      'faq.eyebrow': 'Who pays for what?',
+      'faq.title': 'No pool, no middleman',
+      'faq.lead': 'The point that surprises people most at first — here\'s exactly what happens at each step.',
+      'faq.q1': 'There\'s no pool: so who pays?',
+      'faq.a1': '<b>The drop\'s creator</b>, on every opening, from their own wallet. Nothing is set aside when the drop is created: when a friend taps the envelope, it triggers a direct NIM send — from the creator\'s wallet to the friend\'s — which the creator confirms themselves, natively, one at a time.',
+      'faq.q2': 'What about transaction fees?',
+      'faq.a2': 'On Nimiq, they\'re <b>0 in the vast majority of cases</b> — the network is feeless by design, and the SDK automatically picks the lowest possible fee, often zero. Neither the creator nor the friends pay network fees: only the gift amount itself moves.',
+      'faq.q3': 'Do I need to keep the app open as the creator?',
+      'faq.a3': '<b>Yes.</b> Since every send comes from your own wallet and needs your confirmation, your app has to stay open while your friends open their shares — it\'s not a link that keeps working on its own once you close the app. That\'s the price of "zero custody": no one but you can ever send your funds on your behalf.',
+      'tech.eyebrow': 'Technical integration',
+      'tech.title': 'Built on the real Mini App SDK',
+      'tech.lead': 'This demo runs in simulated mode so it\'s testable in any browser. Inside Nimiq Pay, it automatically switches to real SDK calls — same code, real blockchain.',
+      'tech.li1': 'Automatic detection of <code>window.nimiqPay</code> on load',
+      'tech.li2': 'Creator address read via <code>listAccounts()</code>',
+      'tech.li3': 'Each opening triggers <code>sendBasicTransaction()</code>',
+      'tech.li4': 'Graceful fallback to demo mode outside Nimiq Pay',
+      'tech.tabConnect': 'Connection',
+      'tech.tabSend': 'Sending a share',
+      'footer.desc': 'Built for the Nimiq Mini Apps Competition, Cycle II (August 24 – September 18, 2026). Open prototype, no backend, designed to be hosted and loaded inside Nimiq Pay.',
+      'footer.network': 'Network',
+      'footer.status': 'Status',
+      'footer.statusValue': 'interactive demo'
+    }
+  };
+
+  function detectLang(){
+    var raw = window.nimiqPay && window.nimiqPay.language;
+    return SUPPORTED_LANGS.indexOf(raw) !== -1 ? raw : 'fr';
+  }
+  var currentLang = detectLang();
+
+  function t(key){
+    return (T[currentLang] && T[currentLang][key]) || T.fr[key] || key;
+  }
+
+  function applyStaticTranslations(){
+    document.documentElement.lang = currentLang;
+    document.querySelectorAll('[data-i18n]').forEach(function(el){
+      el.innerHTML = t(el.getAttribute('data-i18n'));
+    });
+  }
 
   // ---------- state ----------
   var state = {
@@ -670,12 +846,12 @@
   modeLucky.addEventListener('click', function(){
     state.mode = 'lucky';
     modeLucky.classList.add('active'); modeEqual.classList.remove('active');
-    modeHelp.textContent = "Chaque part est un montant aléatoire — comme une vraie enveloppe porte-bonheur. Le total distribué reste exact au Luna près.";
+    modeHelp.textContent = t('app.modeHelpLucky');
   });
   modeEqual.addEventListener('click', function(){
     state.mode = 'equal';
     modeEqual.classList.add('active'); modeLucky.classList.remove('active');
-    modeHelp.textContent = "Chaque ami reçoit exactement la même part du montant total.";
+    modeHelp.textContent = t('app.modeHelpEqual');
   });
 
   codeTabConnect.addEventListener('click', function(){
@@ -692,18 +868,18 @@
     var claimedAmt = state.claimed.reduce(function(a,c){ return a + c.amount; }, 0);
     var pct = state.count ? (claimedCount/state.count)*100 : 0;
     progressFill.style.width = pct + '%';
-    progressText.textContent = claimedCount + ' / ' + state.count + ' parts ouvertes';
+    progressText.textContent = claimedCount + ' / ' + state.count + ' ' + t('app.partsOpened');
     progressAmt.textContent = fmt(claimedAmt/100000) + ' / ' + fmt(state.total/100000) + ' NIM';
 
     var remaining = state.count - claimedCount;
     if (remaining <= 0){
-      envelopeLabel.textContent = 'Drop épuisé';
-      envelopeSub.textContent = 'Toutes les parts ont été ouvertes';
+      envelopeLabel.textContent = t('app.envelopeDone');
+      envelopeSub.textContent = t('app.envelopeDoneSub');
       envelopeBtn.disabled = true;
       simulateBtn.disabled = true;
     } else {
-      envelopeLabel.textContent = 'Toucher pour ouvrir';
-      envelopeSub.textContent = remaining + ' part' + (remaining>1?'s':'') + ' restante' + (remaining>1?'s':'');
+      envelopeLabel.textContent = t('app.envelopeTap');
+      envelopeSub.textContent = remaining + ' ' + t(remaining > 1 ? 'app.partsRemaining' : 'app.partRemaining');
       simulateBtn.disabled = false;
     }
   }
@@ -712,7 +888,7 @@
     if (feed.querySelector('.feed-empty')) feed.innerHTML = '';
     var item = document.createElement('div');
     item.className = 'feed-item' + (isYou ? ' you' : '');
-    item.innerHTML = '<span class="who">' + (isYou ? 'Toi' : name) + '</span>' +
+    item.innerHTML = '<span class="who">' + (isYou ? t('app.you') : name) + '</span>' +
       '<span class="amt num">+' + fmt(amount/100000) + ' NIM</span>';
     feed.insertBefore(item, feed.firstChild);
   }
@@ -759,8 +935,8 @@
     state.slices = state.mode === 'lucky' ? luckySplit(totalLuna, count) : equalSplit(totalLuna, count);
     state.claimed = [];
     state.code = randomCode();
-    dropCode.textContent = 'Code : ' + state.code;
-    feed.innerHTML = '<p class="feed-empty">Personne n\'a encore ouvert le drop.</p>';
+    dropCode.textContent = t('app.codeLabel') + ' : ' + state.code;
+    feed.innerHTML = '<p class="feed-empty">' + t('app.feedEmpty') + '</p>';
     luckiestWrap.style.display = 'none';
     envelopeBtn.disabled = false;
     renderProgress();
@@ -823,7 +999,7 @@
       return nimiq.listAccounts().then(function(accounts){
         state.connected = true;
         state.creatorAddress = accounts && accounts[0];
-        $('statusText').textContent = 'Connecté à Nimiq Pay';
+        $('statusText').textContent = t('app.statusLive');
         $('statusPill').classList.add('live');
       });
     }).catch(function(err){
@@ -832,6 +1008,7 @@
   }
   tryConnectNimiqPay();
 
+  applyStaticTranslations();
   renderProgress();
 })();
 </script>
