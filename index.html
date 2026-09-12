@@ -223,6 +223,9 @@
   .stay-online-icon{ font-size:1rem; flex:none; }
   .envelope-wrap{ display:flex; flex-direction:column; align-items:center; padding-top: 8px; gap: 14px; }
   .code-badge{ font-size:.72rem; color: var(--text-faint); background:var(--surface); border:1px dashed var(--border); padding:6px 12px; border-radius:999px; }
+  .share-link-row{ display:flex; gap:8px; width:100%; }
+  .share-link-row input{ flex:1; min-width:0; padding:8px 10px; border-radius:10px; border:1px solid var(--border); background:var(--surface); color:var(--text-dim); font-size:.72rem; font-family:'Sora',sans-serif; }
+  .share-link-row button{ flex:none; padding:8px 12px; border-radius:10px; border:1px solid var(--teal); background:transparent; color:var(--teal-strong); font-weight:700; font-size:.72rem; cursor:pointer; font-family:'Sora',sans-serif; }
   .envelope{
     width: 220px; height: 260px; border-radius: 20px;
     background: linear-gradient(160deg, var(--garnet) 0%, var(--garnet-strong) 70%);
@@ -425,6 +428,10 @@
             </div>
             <div class="envelope-wrap">
               <span class="code-badge" id="dropCode"><span data-i18n="app.codeLabel">Code</span> : ——</span>
+              <div class="share-link-row" id="shareLinkRow" style="display:none;">
+                <input type="text" id="shareLinkInput" readonly />
+                <button type="button" id="copyLinkBtn" data-i18n="app.copyLink">Copier le lien</button>
+              </div>
               <button class="envelope" id="envelopeBtn">
                 <span class="seal">🧧</span>
                 <span class="tap-label" id="envelopeLabel" data-i18n="app.envelopeTap">Toucher pour ouvrir</span>
@@ -627,6 +634,10 @@
       'app.feedEmpty': 'Personne n\'a encore ouvert le drop.',
       'app.you': 'Toi',
       'app.resetBtn': '↺ Recommencer la démo',
+      'app.copyLink': 'Copier le lien',
+      'app.linkCopied': 'Lien copié !',
+      'app.dropNotFound': 'Ce drop n\'existe plus.',
+      'app.dropExhaustedJoin': 'Toutes les parts de ce drop ont déjà été prises.',
       'how.eyebrow': 'Comment ça marche',
       'how.title': 'Trois étapes, zéro friction',
       'how.lead': 'Pensé pour un groupe Telegram, une soirée entre amis, ou une communauté crypto qui veut fêter quelque chose.',
@@ -704,6 +715,10 @@
       'app.feedEmpty': 'No one has opened the drop yet.',
       'app.you': 'You',
       'app.resetBtn': '↺ Restart the demo',
+      'app.copyLink': 'Copy link',
+      'app.linkCopied': 'Link copied!',
+      'app.dropNotFound': 'This drop no longer exists.',
+      'app.dropExhaustedJoin': 'All shares of this drop have already been taken.',
       'how.eyebrow': 'How it works',
       'how.title': 'Three steps, zero friction',
       'how.lead': 'Built for a Telegram group, a night out with friends, or any crypto community celebrating something.',
@@ -767,7 +782,8 @@
     total: 0, count: 0, mode: 'equal',
     slices: [], claimed: [], code: '',
     creatorAddress: null, connected: false,
-    dropId: null, clientRef: null
+    dropId: null, clientRef: null,
+    remaining: 0, isJoiner: false, creatorSecret: null, nimiq: null
   };
 
   function getClientRef(){
@@ -794,9 +810,13 @@
   }
 
   function apiClaim(dropId, claimantRef){
+    // recipient_address: where the creator's poll should actually send the
+    // NIM. Same value as claimant_ref today (the claimer's own connected
+    // address) — kept as a separate field per the contract proposed to
+    // NIMIQ-BACKEND, in case claimant_ref stays opaque later.
     return fetch('/api/v2/nim-drop/claim', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ drop_id: dropId, claimant_ref: claimantRef })
+      body: JSON.stringify({ drop_id: dropId, claimant_ref: claimantRef, recipient_address: claimantRef })
     }).then(function(res){
       if (!res.ok) throw new Error('claim failed: ' + res.status);
       return res.json();
@@ -898,14 +918,20 @@
   });
 
   function renderProgress(){
-    var claimedCount = state.claimed.length;
-    var claimedAmt = state.claimed.reduce(function(a,c){ return a + c.amount; }, 0);
+    var claimedCount = state.count - state.remaining;
+    // Exact claimed amount when we've personally seen every claim (local
+    // simulation, or this same device created the drop); an equal-split
+    // estimate when we only know the aggregate (joined via a shared link,
+    // where /status doesn't expose other people's individual amounts).
+    var claimedAmt = state.isJoiner
+      ? (state.count ? Math.round((state.total / state.count) * claimedCount) : 0)
+      : state.claimed.reduce(function(a,c){ return a + c.amount; }, 0);
     var pct = state.count ? (claimedCount/state.count)*100 : 0;
     progressFill.style.width = pct + '%';
     progressText.textContent = claimedCount + ' / ' + state.count + ' ' + t('app.partsOpened');
     progressAmt.textContent = fmt(claimedAmt/100000) + ' / ' + fmt(state.total/100000) + ' NIM';
 
-    var remaining = state.count - claimedCount;
+    var remaining = state.remaining;
     if (remaining <= 0){
       envelopeLabel.textContent = t('app.envelopeDone');
       envelopeSub.textContent = t('app.envelopeDoneSub');
@@ -938,11 +964,12 @@
   function recordClaim(amount, name, isYou){
     var claim = { idx: state.claimed.length, amount: amount, name: name, address: getClientRef() };
     state.claimed.push(claim);
+    state.remaining = Math.max(0, state.remaining - 1);
     pushFeedItem(name, amount, isYou);
     renderProgress();
     updateLuckiest();
     burstConfetti(isYou ? 90 : 45);
-    if (state.claimed.length === state.count){
+    if (state.remaining === 0){
       setTimeout(function(){ burstConfetti(160); }, 150);
     }
   }
@@ -992,11 +1019,15 @@
     var totalLuna = Math.round(nim * 100000);
     state.total = totalLuna;
     state.count = count;
+    state.remaining = count;
+    state.isJoiner = false;
+    state.creatorSecret = null;
     state.slices = state.mode === 'lucky' ? luckySplit(totalLuna, count) : equalSplit(totalLuna, count);
     state.claimed = [];
     state.dropId = null;
     state.code = randomCode();
     dropCode.textContent = t('app.codeLabel') + ' : ' + state.code;
+    $('shareLinkRow').style.display = 'none';
     feed.innerHTML = '<p class="feed-empty">' + t('app.feedEmpty') + '</p>';
     luckiestWrap.style.display = 'none';
     envelopeBtn.disabled = false;
@@ -1008,13 +1039,18 @@
     // (if) it resolves.
     apiCreateDrop(state.code, totalLuna, count, state.mode).then(function(res){
       state.dropId = res.drop_id || state.code;
+      state.creatorSecret = res.creator_secret || null;
+      showShareLink(state.dropId);
+      startPendingPoll();
     }).catch(function(err){
       console.warn('NIM Drop: claim-lock create unreachable, staying in local demo mode for this drop.', err);
     });
   });
 
   resetBtn.addEventListener('click', function(){
-    state.slices = []; state.claimed = []; state.total = 0; state.count = 0; state.dropId = null;
+    stopPendingPoll();
+    state.slices = []; state.claimed = []; state.total = 0; state.count = 0; state.remaining = 0;
+    state.dropId = null; state.isJoiner = false; state.creatorSecret = null;
     setTab('create');
   });
 
@@ -1062,10 +1098,11 @@
 
   // ---------- real Nimiq Pay detection (progressive enhancement) ----------
   function tryConnectNimiqPay(){
-    if (!window.nimiqPay){ return; }
-    import('https://cdn.jsdelivr.net/npm/@nimiq/mini-app-sdk/+esm').then(function(mod){
+    if (!window.nimiqPay){ return Promise.resolve(); }
+    return import('https://cdn.jsdelivr.net/npm/@nimiq/mini-app-sdk/+esm').then(function(mod){
       return mod.init();
     }).then(function(nimiq){
+      state.nimiq = nimiq;
       return nimiq.listAccounts().then(function(accounts){
         state.connected = true;
         state.creatorAddress = accounts && accounts[0];
@@ -1076,10 +1113,130 @@
       console.warn('NIM Drop: Nimiq Pay SDK unavailable, staying in demo mode.', err);
     });
   }
-  tryConnectNimiqPay();
 
-  applyStaticTranslations();
-  renderProgress();
+  // ---------- share link + joining an existing drop via ?drop=<code> ----------
+  function buildShareLink(dropId){
+    return location.origin + location.pathname + '?drop=' + encodeURIComponent(dropId);
+  }
+
+  function showShareLink(dropId){
+    var input = $('shareLinkInput');
+    input.value = buildShareLink(dropId);
+    $('shareLinkRow').style.display = 'flex';
+  }
+
+  $('copyLinkBtn').addEventListener('click', function(){
+    var input = $('shareLinkInput');
+    input.select();
+    var btn = $('copyLinkBtn');
+    var restore = btn.textContent;
+    (navigator.clipboard && navigator.clipboard.writeText
+      ? navigator.clipboard.writeText(input.value)
+      : Promise.reject()
+    ).catch(function(){
+      try { document.execCommand('copy'); } catch (e) {}
+    }).then(function(){
+      btn.textContent = t('app.linkCopied');
+      setTimeout(function(){ btn.textContent = restore; }, 1800);
+    });
+  });
+
+  function apiStatus(dropId){
+    return fetch('/api/v2/nim-drop/status?drop_id=' + encodeURIComponent(dropId))
+      .then(function(res){
+        if (res.status === 404) return { exists: false };
+        if (!res.ok) throw new Error('status failed: ' + res.status);
+        return res.json().then(function(data){ data.exists = true; return data; });
+      });
+  }
+
+  function joinDropFromUrl(){
+    var params = new URLSearchParams(location.search);
+    var dropId = params.get('drop');
+    if (!dropId) return;
+    apiStatus(dropId).then(function(res){
+      if (!res.exists){
+        alert(t('app.dropNotFound'));
+        return;
+      }
+      state.dropId = dropId;
+      state.count = res.count;
+      state.total = res.total_luna;
+      state.remaining = res.remaining;
+      state.isJoiner = true;
+      state.claimed = [];
+      dropCode.textContent = t('app.codeLabel') + ' : ' + dropId;
+      luckiestWrap.style.display = 'none';
+      $('shareLinkRow').style.display = 'none';
+      feed.innerHTML = '<p class="feed-empty">' + t('app.feedEmpty') + '</p>';
+      renderProgress();
+      setTab('open');
+      if (res.remaining <= 0){
+        envelopeSub.textContent = t('app.envelopeDoneSub');
+        envelopeBtn.disabled = true;
+      }
+    }).catch(function(err){
+      console.warn('NIM Drop: could not load drop from link.', err);
+    });
+  }
+
+  // ---------- creator-side: sending the real NIM for claims already made ----------
+  // Contract proposed to (and accepted by) NIMIQ-BACKEND: exact param names
+  // (query/header/body for the secret, response shape) to be confirmed —
+  // this fails silently (caught, logged, polling just retries) if they turn
+  // out different, so it can't break the rest of the app.
+  function apiPending(dropId, secret){
+    return fetch('/api/v2/nim-drop/pending?drop_id=' + encodeURIComponent(dropId) + '&secret=' + encodeURIComponent(secret))
+      .then(function(res){
+        if (!res.ok) throw new Error('pending failed: ' + res.status);
+        return res.json();
+      });
+  }
+
+  function apiMarkSent(dropId, partId, secret){
+    return fetch('/api/v2/nim-drop/mark-sent', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ drop_id: dropId, part_id: partId, secret: secret })
+    });
+  }
+
+  var pendingPollTimer = null;
+  function stopPendingPoll(){
+    if (pendingPollTimer){ clearInterval(pendingPollTimer); pendingPollTimer = null; }
+  }
+
+  function processPendingSends(){
+    if (!state.dropId || !state.creatorSecret || !state.nimiq) return;
+    apiPending(state.dropId, state.creatorSecret).then(function(res){
+      var claims = (res && (res.claims || res.pending)) || [];
+      claims.forEach(function(c){
+        var recipient = c.recipient_address || c.address;
+        var amount = c.amount_luna != null ? c.amount_luna : c.amount;
+        var partId = c.part_id != null ? c.part_id : c.id;
+        if (!recipient || amount == null) return;
+        state.nimiq.sendBasicTransaction({ recipient: recipient, value: amount }).then(function(){
+          return apiMarkSent(state.dropId, partId, state.creatorSecret);
+        }).catch(function(err){
+          console.warn('NIM Drop: failed to send/mark a pending claim, will retry next poll.', err);
+        });
+      });
+    }).catch(function(err){
+      console.warn('NIM Drop: pending sends check failed (contract may need adjusting).', err);
+    });
+  }
+
+  function startPendingPoll(){
+    stopPendingPoll();
+    if (!state.creatorSecret || !state.nimiq) return;
+    processPendingSends();
+    pendingPollTimer = setInterval(processPendingSends, 4000);
+  }
+
+  tryConnectNimiqPay().then(function(){
+    applyStaticTranslations();
+    renderProgress();
+    joinDropFromUrl();
+  });
 })();
 </script>
 </body>
