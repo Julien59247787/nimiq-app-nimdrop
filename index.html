@@ -1406,7 +1406,37 @@
     return r && (r.hash || r.transactionHash || (r.data && r.data.hash)) || null;
   }
   function escHtml(s){ return String(s).replace(/[&<>"']/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]; }); }
+  // Server lease (NIMIQ-BACKEND contract, 2026-11-16). Resolves 'go' (lease taken, or old server without the
+  // route: an HTML/non-JSON 404 -> local protection only), 'sent' / 'busy' (never send), or rejects (network or other
+  // error: nothing is sent, the part is simply tried at a later poll).
+  function apiBeginSend(partId){
+    return fetch('/api/v2/nim-drop/begin-send', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ drop_id: state.dropId, secret: state.creatorSecret, part_id: partId })
+    }).then(function(res){
+      return res.json().then(function(b){ return { status: res.status, body: b }; }, function(){ return { status: res.status, body: null }; });
+    }).then(function(r){
+      if (r.status === 200 && r.body && r.body.ok) return { go: true };
+      if (r.status === 404 && !(r.body && r.body.error)) return { go: true, legacy: true };
+      if (r.body && r.body.error === 'already_sent') return { sent: true, hash: r.body.tx_hash || null };
+      if (r.body && r.body.error === 'already_sending') return { busy: true };
+      throw new Error('begin-send: ' + r.status + ' ' + (r.body && r.body.error || ''));
+    });
+  }
+  function apiReleaseSend(partId){
+    return fetch('/api/v2/nim-drop/release-send', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ drop_id: state.dropId, secret: state.creatorSecret, part_id: partId })
+    }).catch(function(){});
+  }
   function sendOnePart(c){
+    return apiBeginSend(c.partId).then(function(lease){
+      if (lease.sent){ setSendState(String(c.partId), { status: 'sent', recipient: c.recipient, amount: c.amount, hash: lease.hash, reason: null }); return; }
+      if (lease.busy) return;   // another page holds the lease: never send
+      return sendOnePartNow(c);
+    }, function(err){ console.warn('NIM Drop: begin-send failed, nothing sent; will try later.', err); });
+  }
+  function sendOnePartNow(c){
     var partId = String(c.partId);
     setSendState(partId, { status: 'inflight', recipient: c.recipient, amount: c.amount, hash: null, reason: null });
     var timer;
@@ -1426,7 +1456,7 @@
     }, function(err){
       clearTimeout(timer);
       if (err && err.__timeout) setSendState(partId, { status: 'verify', reason: 'timeout' });
-      else if (errCode(err) === 4001 || /user rejected|cancel/i.test(String(err && err.message || ''))) setSendState(partId, { status: 'cancelled', reason: 'cancelled' });
+      else if (errCode(err) === 4001 || /user rejected|cancel/i.test(String(err && err.message || ''))) { setSendState(partId, { status: 'cancelled', reason: 'cancelled' }); apiReleaseSend(c.partId); }
       else setSendState(partId, { status: 'verify', reason: 'unknown', detail: String(err && (err.message || err.type) || err) });
       console.warn('NIM Drop: send of part ' + partId + ' not confirmed; never re-sent automatically.', err);
     });
