@@ -390,6 +390,12 @@
     html{ scroll-behavior:auto; }
     *{ animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
   }
+.send-issues{ margin:12px 0; padding:10px 12px; border:1px solid #e0a43a; border-radius:10px; background:rgba(224,164,58,.08); font-size:13px; }
+.send-issues h4{ margin:0 0 6px; font-size:14px; }
+.send-issue{ padding:8px 0; border-top:1px solid rgba(224,164,58,.3); }
+.send-issue:first-of-type{ border-top:0; }
+.send-issue code{ font-size:11px; word-break:break-all; }
+.send-issue button{ margin:6px 6px 0 0; font-size:12px; padding:5px 9px; border-radius:7px; border:1px solid currentColor; background:transparent; color:inherit; cursor:pointer; }
 </style>
 </head>
 <body>
@@ -493,6 +499,8 @@
                 <span data-i18n="app.luckiestPrefix">Part la plus chanceuse :</span> <b id="luckiestName">—</b> <span data-i18n="app.luckiestWith">avec</span> <b class="num" id="luckiestAmt">—</b> NIM
               </div>
             </div>
+
+            <div class="send-issues" id="sendIssues" hidden></div>
 
             <div class="feed" id="feed">
               <p class="feed-empty" data-i18n="app.feedEmpty">Personne n'a encore ouvert le drop.</p>
@@ -682,6 +690,16 @@
       'app.feedEmpty': 'Personne n\'a encore ouvert le drop.',
       'app.you': 'Toi',
       'app.resetBtn': '↺ Recommencer la démo',
+      'app.sendIssuesTitle': 'Envois à vérifier',
+      'app.sendIssuesLead': 'Pour ces parts, Nimiq Pay n\'a pas pu confirmer l\'envoi. Rien ne sera renvoyé automatiquement : vérifie l\'historique de ton wallet avant d\'agir.',
+      'app.sendIssueUnknown': 'Issue inconnue : l\'envoi est peut-être parti.',
+      'app.sendIssueMarkFailed': 'NIM envoyés, mais le serveur n\'a pas pu l\'enregistrer.',
+      'app.sendIssueTimeout': 'Pas de réponse de Nimiq Pay : l\'envoi est peut-être parti.',
+      'app.sendIssueCancelled': 'Envoi annulé.',
+      'app.sendIssueHash': 'Transaction :',
+      'app.sendIssueMarkSentBtn': 'C\'est envoyé : enregistrer',
+      'app.sendIssueRetryBtn': 'Pas envoyé : renvoyer',
+      'app.sendIssueRetryConfirm': 'As-tu vérifié dans l\'historique de ton wallet que cette part n\'a PAS été envoyée ? Sinon, le participant serait payé deux fois.',
       'app.copyLink': 'Copier le lien',
       'app.linkCopied': 'Lien copié !',
       'app.dropNotFound': 'Ce drop n\'existe plus.',
@@ -768,6 +786,16 @@
       'app.feedEmpty': 'No one has opened the drop yet.',
       'app.you': 'You',
       'app.resetBtn': '↺ Restart the demo',
+      'app.sendIssuesTitle': 'Sends to check',
+      'app.sendIssuesLead': 'For these parts, Nimiq Pay could not confirm the send. Nothing is re-sent automatically: check your wallet history before acting.',
+      'app.sendIssueUnknown': 'Outcome unknown: the send may have gone out.',
+      'app.sendIssueMarkFailed': 'NIM sent, but the server could not record it.',
+      'app.sendIssueTimeout': 'No answer from Nimiq Pay: the send may have gone out.',
+      'app.sendIssueCancelled': 'Send cancelled.',
+      'app.sendIssueHash': 'Transaction:',
+      'app.sendIssueMarkSentBtn': 'It was sent: record it',
+      'app.sendIssueRetryBtn': 'Not sent: send again',
+      'app.sendIssueRetryConfirm': 'Did you check in your wallet history that this part was NOT sent? Otherwise the participant would be paid twice.',
       'app.copyLink': 'Copy link',
       'app.linkCopied': 'Link copied!',
       'app.dropNotFound': 'This drop no longer exists.',
@@ -1324,10 +1352,16 @@
       });
   }
 
-  function apiMarkSent(dropId, partId, secret){
+  function apiMarkSent(dropId, partId, secret, txHash){
     return fetch('/api/v2/nim-drop/mark-sent', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ drop_id: dropId, part_id: partId, secret: secret })
+      body: JSON.stringify({ drop_id: dropId, part_id: partId, secret: secret, tx_hash: txHash || undefined })
+    }).then(function(res){
+      if (!res.ok) throw new Error('mark-sent failed: ' + res.status);
+      return res.json().catch(function(){ throw new Error('mark-sent: unreadable answer'); });
+    }).then(function(body){
+      if (body && (body.ok === false || body.error)) throw new Error('mark-sent refused: ' + (body.error || 'ok=false'));
+      return body;
     });
   }
 
@@ -1336,29 +1370,127 @@
     if (pendingPollTimer){ clearInterval(pendingPollTimer); pendingPollTimer = null; }
   }
 
+  // Hotfix 2026-11-16 (money, never pay a part twice). One state per part, remembered in this browser:
+  //   inflight  : the wallet was asked, no answer yet (never asked again);
+  //   sent      : NIM sent and recorded by the server;
+  //   verify    : outcome unknown (-32001, -32603, any error but a cancellation, 120 s without answer) or NIM sent
+  //               but mark-sent failed. NEVER re-sent automatically: the creator checks the wallet history and
+  //               resumes by hand ("It was sent: record it" or "Not sent: send again");
+  //   cancelled : the creator cancelled in the wallet (4001); resumed by hand only.
+  // Parts are sent one at a time; a poll does nothing while another is still running.
+  var SEND_TIMEOUT_MS = 120000;
+  var sendStates = {};
+  var pollBusy = false;
+  function sendStateKey(){ return 'nimdrop_send_' + state.dropId; }
+  function loadSendStates(){
+    sendStates = {};
+    try { sendStates = JSON.parse(localStorage.getItem(sendStateKey()) || '{}') || {}; } catch (e) { sendStates = {}; }
+    // a part left 'inflight' by a closed page has an unknown outcome
+    Object.keys(sendStates).forEach(function(k){ if (sendStates[k].status === 'inflight') sendStates[k].status = 'verify', sendStates[k].reason = 'timeout'; });
+  }
+  function saveSendStates(){ try { localStorage.setItem(sendStateKey(), JSON.stringify(sendStates)); } catch (e) {} }
+  function setSendState(partId, patch){
+    var s = sendStates[partId] || {};
+    for (var k in patch) s[k] = patch[k];
+    s.at = Date.now();
+    sendStates[partId] = s;
+    saveSendStates();
+    renderSendIssues();
+  }
+  function errCode(err){
+    var o = err && typeof err === 'object' ? err : {};
+    return o.code != null ? o.code : (o.error && o.error.code != null ? o.error.code : null);
+  }
+  function txHashOf(r){
+    if (typeof r === 'string') return r;
+    return r && (r.hash || r.transactionHash || (r.data && r.data.hash)) || null;
+  }
+  function escHtml(s){ return String(s).replace(/[&<>"']/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]; }); }
+  function sendOnePart(c){
+    var partId = String(c.partId);
+    setSendState(partId, { status: 'inflight', recipient: c.recipient, amount: c.amount, hash: null, reason: null });
+    var timer;
+    var timeout = new Promise(function(_, rej){ timer = setTimeout(function(){ rej({ __timeout: true }); }, SEND_TIMEOUT_MS); });
+    var send = Promise.resolve().then(function(){ return state.nimiq.sendBasicTransaction({ recipient: c.recipient, value: c.amount }); });
+    // a late answer after the timeout still records the hash (the part stays 'verify')
+    send.then(function(r){ var h = txHashOf(r); if (h && sendStates[partId] && !sendStates[partId].hash) setSendState(partId, { hash: h }); }, function(){});
+    return Promise.race([send, timeout]).then(function(r){
+      clearTimeout(timer);
+      var h = txHashOf(r);
+      setSendState(partId, { status: 'verify', reason: 'markFailed', hash: h });   // until the server confirms
+      return apiMarkSent(state.dropId, c.partId, state.creatorSecret, h).then(function(){
+        setSendState(partId, { status: 'sent', reason: null });
+      }, function(err){
+        console.warn('NIM Drop: NIM sent but mark-sent failed; part ' + partId + ' set to check, never re-sent.', err);
+      });
+    }, function(err){
+      clearTimeout(timer);
+      if (err && err.__timeout) setSendState(partId, { status: 'verify', reason: 'timeout' });
+      else if (errCode(err) === 4001 || /user rejected|cancel/i.test(String(err && err.message || ''))) setSendState(partId, { status: 'cancelled', reason: 'cancelled' });
+      else setSendState(partId, { status: 'verify', reason: 'unknown', detail: String(err && (err.message || err.type) || err) });
+      console.warn('NIM Drop: send of part ' + partId + ' not confirmed; never re-sent automatically.', err);
+    });
+  }
   function processPendingSends(){
-    if (!state.dropId || !state.creatorSecret || !state.nimiq) return;
+    if (!state.dropId || !state.creatorSecret || !state.nimiq || pollBusy) return;
+    pollBusy = true;
     apiPending(state.dropId, state.creatorSecret).then(function(res){
       var claims = (res && (res.claims || res.pending)) || [];
+      var todo = [];
       claims.forEach(function(c){
         var recipient = c.recipient_address || c.address;
         var amount = c.amount_luna != null ? c.amount_luna : c.amount;
         var partId = c.part_id != null ? c.part_id : c.id;
-        if (!recipient || amount == null) return;
-        state.nimiq.sendBasicTransaction({ recipient: recipient, value: amount }).then(function(){
-          return apiMarkSent(state.dropId, partId, state.creatorSecret);
-        }).catch(function(err){
-          console.warn('NIM Drop: failed to send/mark a pending claim, will retry next poll.', err);
-        });
+        if (!recipient || amount == null || partId == null) return;
+        if (sendStates[String(partId)]) return;   // any known state: never sent again automatically
+        todo.push({ recipient: recipient, amount: amount, partId: partId });
       });
+      return todo.reduce(function(p, c){ return p.then(function(){ return sendOnePart(c); }); }, Promise.resolve());
     }).catch(function(err){
-      console.warn('NIM Drop: pending sends check failed (contract may need adjusting).', err);
-    });
+      console.warn('NIM Drop: pending sends check failed.', err);
+    }).then(function(){ pollBusy = false; });
   }
+  function renderSendIssues(){
+    var box = document.getElementById('sendIssues');
+    if (!box) return;
+    var ids = Object.keys(sendStates).filter(function(k){ return sendStates[k].status === 'verify' || sendStates[k].status === 'cancelled'; });
+    if (!ids.length){ box.hidden = true; box.innerHTML = ''; return; }
+    var reasonKey = { unknown: 'app.sendIssueUnknown', markFailed: 'app.sendIssueMarkFailed', timeout: 'app.sendIssueTimeout', cancelled: 'app.sendIssueCancelled' };
+    box.hidden = false;
+    box.innerHTML = '<h4>' + escHtml(t('app.sendIssuesTitle')) + '</h4><p>' + escHtml(t('app.sendIssuesLead')) + '</p>' +
+      ids.map(function(id){
+        var s = sendStates[id];
+        var nim = s.amount != null ? fmt(s.amount / 100000) : '?';
+        return '<div class="send-issue"><b>' + escHtml(nim) + ' NIM</b> → <code>' + escHtml(s.recipient || '?') + '</code><br>' +
+          escHtml(t(reasonKey[s.reason] || 'app.sendIssueUnknown')) +
+          (s.hash ? '<br>' + escHtml(t('app.sendIssueHash')) + ' <code>' + escHtml(s.hash) + '</code>' : '') + '<br>' +
+          (s.status === 'verify' ? '<button type="button" data-act="mark" data-part="' + escHtml(id) + '">' + escHtml(t('app.sendIssueMarkSentBtn')) + '</button>' : '') +
+          '<button type="button" data-act="retry" data-part="' + escHtml(id) + '">' + escHtml(t('app.sendIssueRetryBtn')) + '</button></div>';
+      }).join('');
+  }
+  document.addEventListener('click', function(ev){
+    var b = ev.target && ev.target.closest ? ev.target.closest('#sendIssues button[data-act]') : null;
+    if (!b || pollBusy) return;
+    var id = b.getAttribute('data-part'), s = sendStates[id];
+    if (!s) return;
+    if (b.getAttribute('data-act') === 'mark'){
+      pollBusy = true;
+      apiMarkSent(state.dropId, id, state.creatorSecret, s.hash).then(function(){ setSendState(id, { status: 'sent', reason: null }); },
+        function(err){ console.warn('NIM Drop: manual mark-sent failed.', err); alert(t('app.sendIssueMarkFailed')); })
+        .then(function(){ pollBusy = false; });
+    } else {
+      if (s.status === 'verify' && !confirm(t('app.sendIssueRetryConfirm'))) return;
+      pollBusy = true;
+      sendOnePart({ recipient: s.recipient, amount: s.amount, partId: id }).then(function(){ pollBusy = false; });
+    }
+  });
+  document.addEventListener('vs-lang', renderSendIssues);
 
   function startPendingPoll(){
     stopPendingPoll();
     if (!state.creatorSecret || !state.nimiq) return;
+    loadSendStates();
+    renderSendIssues();
     processPendingSends();
     pendingPollTimer = setInterval(processPendingSends, 4000);
   }
